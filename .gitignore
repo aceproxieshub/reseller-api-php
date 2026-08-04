@@ -1,0 +1,17 @@
+# Ignore build files
+build/*
+
+# macOS store files
+.DS_Store
+
+# Composer
+composer.phar
+composer-local.*
+/vendor/
+
+# Ignore IDE related configs
+.idea
+.vscode
+*.swp
+*.swo
+

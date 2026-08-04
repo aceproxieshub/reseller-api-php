@@ -1,0 +1,10 @@
+{
+    "name": "aceproxieshub/reseller-api-php",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Aceproxies\\ResellerApi\\": "src/"
+        }
+    },
+    "require": {}
+}
