@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Rector for automated PHP refactoring
+- PHP 8.3 minimum language version and Rector PHP 8.3 configuration
 - PHPstan and configuration
 - PHP_CodeSniffer and coding standard definition
 - Initial PHP library package structure
