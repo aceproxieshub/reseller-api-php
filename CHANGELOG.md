@@ -9,5 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added PHP_CodeSniffer and coding standard definition
+- PHPstan and configuration
+- PHP_CodeSniffer and coding standard definition
 - Initial PHP library package structure
