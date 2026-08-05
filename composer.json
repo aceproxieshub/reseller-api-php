@@ -6,5 +6,13 @@
             "Aceproxies\\ResellerApi\\": "src/"
         }
     },
-    "require": {}
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0",
+        "slevomat/coding-standard": "^8.31"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
 }
