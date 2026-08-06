@@ -13,7 +13,8 @@
         "squizlabs/php_codesniffer": "^4.0",
         "slevomat/coding-standard": "^8.31",
         "phpstan/phpstan": "^2.2",
-        "rector/rector": "^2.6"
+        "rector/rector": "^2.6",
+        "phpunit/phpunit": "^13.2"
     },
     "config": {
         "allow-plugins": {
