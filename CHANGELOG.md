@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Health endpoint support through Client::health()->getHealth()
+- Typed HealthResponse and HealthInterface
+- Library HttpClientInterface and Symfony-backed HTTP client
+- Generic response factory for API envelope and DTO hydration
+- Retry handling for rate limits, server failures, and transport errors
 - Rector for automated PHP refactoring
 - PHPUnit configuration
 - PHP 8.3 minimum language version and Rector PHP 8.3 configuration
