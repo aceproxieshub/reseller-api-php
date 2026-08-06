@@ -9,4 +9,6 @@ use Aceproxies\ResellerApi\Endpoint\HealthInterface;
 interface ClientInterface
 {
     public function health(): HealthInterface;
+
+    public function getApiVersion(): string;
 }
