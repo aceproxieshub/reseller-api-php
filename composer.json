@@ -6,6 +6,11 @@
             "Aceproxies\\ResellerApi\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Aceproxies\\ResellerApi\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": "^8.3",
         "symfony/http-client": "^7.0"

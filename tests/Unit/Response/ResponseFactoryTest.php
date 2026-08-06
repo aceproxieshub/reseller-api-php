@@ -91,24 +91,3 @@ final class ResponseFactoryTest extends TestCase
         $this->factory = new ResponseFactory();
     }
 }
-
-final readonly class OptionalResponse
-{
-    public function __construct(
-        public string $status,
-        public string $message = 'default',
-    ) {
-    }
-}
-
-final class EmptyResponse
-{
-}
-
-final class ThrowingResponse
-{
-    public function __construct(string $status)
-    {
-        throw new RuntimeException($status);
-    }
-}
