@@ -49,11 +49,7 @@ final readonly class HttpClient implements HttpClientInterface
                     $this->waitBeforeRetry($attempt, $response);
                     continue;
                 }
-            } catch (TransportExceptionInterface $exception) {
-                if ($attempt >= HttpClientInterface::MAX_ATTEMPTS) {
-                    throw new TransportException('The HTTP request failed.', $exception);
-                }
-
+            } catch (TransportExceptionInterface) {
                 $this->waitBeforeRetry($attempt);
                 continue;
             }
