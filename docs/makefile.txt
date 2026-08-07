@@ -1,0 +1,17 @@
+  _____  ______  _____ ______ _      _      ______ _____             _____ _____
+ |  __ \|  ____|/ ____|  ____| |    | |    |  ____|  __ \      /\   |  __ \_   _|
+ | |__) | |__  | (___ | |__  | |    | |    | |__  | |__) |    /  \  | |__) || |
+ |  _  /|  __|  \___ \|  __| | |    | |    |  __| |  _  /    / /\ \ |  ___/ | |
+ | | \ \| |____ ____) | |____| |____| |____| |____| | \ \   / ____ \| |    _| |_
+ |_|  \_\______|_____/|______|______|______|______|_|  \_\ /_/    \_\_|   |_____|
+
+
+----------------------------------------------------------------------------------
+rector                        Apply Rector's refactorings to the source code
+rector-dry                    Preview Rector's refactorings without changing files
+phpcbf                        Automatically fix coding-standard violations
+phpstan                       Run PHPStan static analysis
+phpunit                       Run the PHPUnit test suite
+phpunit-coverage              Run PHPUnit and generate an HTML coverage report
+infection                     Run Infection mutation testing with PHPUnit
+----------------------------------------------------------------------------------
