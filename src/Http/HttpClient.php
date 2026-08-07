@@ -16,6 +16,7 @@ final readonly class HttpClient implements HttpClientInterface
     public function __construct(
         private SymfonyHttpClientInterface $client,
         private ResponseFactory $responseFactory = new ResponseFactory(),
+        private ?string $token = null,
     ) {
     }
 
@@ -34,10 +35,15 @@ final readonly class HttpClient implements HttpClientInterface
             $headers = [];
         }
 
-        $options['headers'] = array_merge(
-            [HttpClientInterface::HEADER_ACCEPT => HttpClientInterface::HEADER_ACCEPT_JSON],
-            $headers,
-        );
+        $defaultHeaders = [
+            HttpClientInterface::HEADER_ACCEPT => HttpClientInterface::HEADER_ACCEPT_JSON,
+        ];
+
+        if ($this->token !== null) {
+            $defaultHeaders[HttpClientInterface::HEADER_AUTHORIZATION] = 'Bearer ' . $this->token;
+        }
+
+        $options['headers'] = array_merge($defaultHeaders, $headers);
 
         for ($attempt = 1; $attempt <= HttpClientInterface::MAX_ATTEMPTS; $attempt++) {
             try {
