@@ -20,11 +20,13 @@
         "slevomat/coding-standard": "^8.31",
         "phpstan/phpstan": "^2.2",
         "rector/rector": "^2.6",
-        "phpunit/phpunit": "^13.2"
+        "phpunit/phpunit": "^13.2",
+        "infection/infection": "^0.34.1"
     },
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "infection/extension-installer": true
         }
     }
 }
