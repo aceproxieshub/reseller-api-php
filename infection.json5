@@ -8,6 +8,7 @@
     "logs": {
         "text": "build/infection.log"
     },
+    "minMsi": 98,
     "mutators": {
         "@default": true
     }

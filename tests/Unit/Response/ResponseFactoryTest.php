@@ -40,16 +40,24 @@ final class ResponseFactoryTest extends TestCase
 
     public function testMissingDataThrowsInvalidResponseException(): void
     {
-        $this->expectException(InvalidResponseException::class);
-
-        $this->factory->create('{}', HealthResponse::class, 200);
+        try {
+            $this->factory->create('{}', EmptyResponse::class, 200);
+            self::fail('Expected InvalidResponseException.');
+        } catch (InvalidResponseException $exception) {
+            self::assertNull($exception->getPrevious());
+            self::assertSame(200, $exception->statusCode);
+            self::assertSame('{}', $exception->body);
+        }
     }
 
     public function testMissingRequiredPropertyThrowsInvalidResponseException(): void
     {
-        $this->expectException(InvalidResponseException::class);
-
-        $this->factory->create('{"data":{}}', HealthResponse::class, 200);
+        try {
+            $this->factory->create('{"data":{}}', HealthResponse::class, 200);
+            self::fail('Expected InvalidResponseException.');
+        } catch (InvalidResponseException $exception) {
+            self::assertNull($exception->getPrevious());
+        }
     }
 
     public function testOptionalConstructorPropertyUsesDefaultValue(): void
@@ -84,6 +92,25 @@ final class ResponseFactoryTest extends TestCase
         $response = $this->factory->create('{"data":{}}', EmptyResponse::class, 200);
 
         self::assertInstanceOf(EmptyResponse::class, $response);
+    }
+
+    public function testSupportsJsonAtConfiguredMaximumDepth(): void
+    {
+        $body = '{"data":' . str_repeat('[', 510) . '1' . str_repeat(']', 510) . '}';
+
+        self::assertInstanceOf(EmptyResponse::class, $this->factory->create($body, EmptyResponse::class, 200));
+    }
+
+    public function testRejectsJsonBeyondConfiguredMaximumDepth(): void
+    {
+        $body = '{"data":' . str_repeat('[', 511) . '1' . str_repeat(']', 511) . '}';
+
+        try {
+            $this->factory->create($body, EmptyResponse::class, 200);
+            self::fail('Expected InvalidResponseException.');
+        } catch (InvalidResponseException $exception) {
+            self::assertInstanceOf(JsonException::class, $exception->getPrevious());
+        }
     }
 
     protected function setUp(): void
