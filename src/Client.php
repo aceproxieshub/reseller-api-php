@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi;
 
+use Aceproxies\ResellerApi\Endpoint\Balance;
+use Aceproxies\ResellerApi\Endpoint\BalanceInterface;
 use Aceproxies\ResellerApi\Endpoint\Health;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
@@ -27,12 +29,17 @@ final readonly class Client implements ClientInterface
             throw new InvalidArgumentException('The API token must not be empty.');
         }
 
-        $this->httpClient = $httpClient ?? new HttpClient(SymfonyHttpClient::create());
+        $this->httpClient = $httpClient ?? new HttpClient(SymfonyHttpClient::create(), token: $token);
     }
 
     public function health(): HealthInterface
     {
         return new Health($this->httpClient, $this->baseUrl);
+    }
+
+    public function balance(): BalanceInterface
+    {
+        return new Balance($this->httpClient, $this->baseUrl);
     }
 
     public function getApiVersion(): string

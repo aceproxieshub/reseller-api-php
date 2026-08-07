@@ -25,6 +25,7 @@ interface HttpClientInterface
 
     public const string HEADER_ACCEPT = 'Accept';
     public const string HEADER_ACCEPT_JSON = 'application/json';
+    public const string HEADER_AUTHORIZATION = 'Authorization';
     public const string HEADER_RETRY_AFTER = 'retry-after';
 
     /**

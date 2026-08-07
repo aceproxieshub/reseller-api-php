@@ -19,14 +19,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class HttpClientTest extends TestCase
 {
-    private MockObject&SymfonyHttpClientInterface $client;
+    private ?SymfonyHttpClientInterface $client = null;
 
     private HttpClient $httpClient;
 
     public function testSuccessfulRequestSerializesResponseAndAddsAcceptHeader(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client
+        $this->client()
             ->expects(self::once())
             ->method('request')
             ->with(
@@ -49,12 +49,37 @@ final class HttpClientTest extends TestCase
         self::assertSame('ok', $result->status);
     }
 
+    public function testAuthenticatedRequestAddsBearerAuthorizationHeader(): void
+    {
+        $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
+        $this->client()
+            ->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/health',
+                self::callback(static function (array $options): bool {
+                    return $options['headers'] === [
+                        HttpClientInterface::HEADER_ACCEPT => HttpClientInterface::HEADER_ACCEPT_JSON,
+                        HttpClientInterface::HEADER_AUTHORIZATION => 'Bearer api-token',
+                    ];
+                }),
+            )
+            ->willReturn($response);
+
+        (new HttpClient($this->client(), token: 'api-token'))->request(
+            method: HttpClientInterface::METHOD_GET,
+            url: 'https://example.test/health',
+            responseClass: HealthResponse::class,
+        );
+    }
+
     public function testSuccessfulRequestReadsResponseContentWithoutThrowing(): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->expects(self::once())->method('getStatusCode')->willReturn(HttpClientInterface::HTTP_OK);
         $response->expects(self::once())->method('getContent')->with(false)->willReturn('{"data":{"status":"ok"}}');
-        $this->client
+        $this->client()
             ->expects(self::once())
             ->method('request')
             ->willReturn($response);
@@ -71,7 +96,7 @@ final class HttpClientTest extends TestCase
     public function testCallerHeadersArePreservedAndDefaultAcceptCanBeOverridden(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client
+        $this->client()
             ->expects(self::once())
             ->method('request')
             ->with(
@@ -97,7 +122,7 @@ final class HttpClientTest extends TestCase
     public function testInvalidHeadersAreNormalizedToDefaultHeaders(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client
+        $this->client()
             ->expects(self::once())
             ->method('request')
             ->with(HttpClientInterface::METHOD_GET, 'https://example.test/health', self::callback(static function (array $options): bool {
@@ -119,7 +144,7 @@ final class HttpClientTest extends TestCase
     {
         $body = '{"error":{"message":"Unauthorized"}}';
         $response = $this->response(HttpClientInterface::HTTP_UNAUTHORIZED, $body);
-        $this->client
+        $this->client()
             ->expects(self::once())
             ->method('request')
             ->willReturn($response);
@@ -142,7 +167,7 @@ final class HttpClientTest extends TestCase
     {
         $body = '{"error":{"message":"Redirect"}}';
         $response = $this->response(300, $body);
-        $this->client
+        $this->client()
             ->expects(self::once())
             ->method('request')
             ->willReturn($response);
@@ -159,7 +184,7 @@ final class HttpClientTest extends TestCase
     {
         $failed = $this->response(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR, '', ['retry-after' => ['0']]);
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(2))
             ->method('request')
             ->willReturnOnConsecutiveCalls($failed, $successful);
 
@@ -177,7 +202,7 @@ final class HttpClientTest extends TestCase
         $startedAt = hrtime(true);
         $failed = $this->response(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR, '');
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client->expects(self::exactly(3))
+        $this->client()->expects(self::exactly(3))
             ->method('request')
             ->willReturnOnConsecutiveCalls($failed, $failed, $successful);
 
@@ -196,7 +221,7 @@ final class HttpClientTest extends TestCase
     {
         $failed = $this->response(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR, '', [HttpClientInterface::HEADER_RETRY_AFTER => ['invalid-date']]);
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(2))
             ->method('request')
             ->willReturnOnConsecutiveCalls($failed, $successful);
 
@@ -214,7 +239,7 @@ final class HttpClientTest extends TestCase
         $retryAfter = gmdate('D, d M Y H:i:s \\G\\M\\T', time() - 1);
         $failed = $this->response(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR, '', [HttpClientInterface::HEADER_RETRY_AFTER => [$retryAfter]]);
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(2))
             ->method('request')
             ->willReturnOnConsecutiveCalls($failed, $successful);
 
@@ -247,7 +272,7 @@ final class HttpClientTest extends TestCase
             },
         );
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
-        $this->client->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(2))
             ->method('request')
             ->willReturnOnConsecutiveCalls($response, $successful);
 
@@ -306,7 +331,7 @@ final class HttpClientTest extends TestCase
             fn (string $body): ResponseInterface => $this->response(HttpClientInterface::HTTP_UNAUTHORIZED, $body),
             ['{"error":"invalid"}', '{"error":{"message":123}}'],
         );
-        $this->client->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(2))
             ->method('request')
             ->willReturnOnConsecutiveCalls(...$responses);
 
@@ -329,7 +354,7 @@ final class HttpClientTest extends TestCase
     public function testExhaustedServerErrorsThrowApiException(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_SERVICE_UNAVAILABLE, '{"error":{"message":"Unavailable"}}', ['retry-after' => ['0']]);
-        $this->client->expects(self::exactly(HttpClientInterface::MAX_ATTEMPTS))
+        $this->client()->expects(self::exactly(HttpClientInterface::MAX_ATTEMPTS))
             ->method('request')
             ->willReturn($response);
 
@@ -346,7 +371,7 @@ final class HttpClientTest extends TestCase
         $startedAt = hrtime(true);
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
         $attempts = 0;
-        $this->client->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(2))
             ->method('request')
             ->willReturnCallback(static function () use (&$attempts, $successful): ResponseInterface {
                 $attempts++;
@@ -371,7 +396,7 @@ final class HttpClientTest extends TestCase
     public function testExhaustedTransportFailuresThrowTransportException(): void
     {
         $transportException = new SymfonyTransportException('Connection failed.');
-        $this->client->expects(self::exactly(HttpClientInterface::MAX_ATTEMPTS))
+        $this->client()->expects(self::exactly(HttpClientInterface::MAX_ATTEMPTS))
             ->method('request')
             ->willThrowException($transportException);
 
@@ -389,8 +414,19 @@ final class HttpClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->client = $this->createMock(SymfonyHttpClientInterface::class);
-        $this->httpClient = new HttpClient($this->client);
+        $this->httpClient = new HttpClient($this->createStub(SymfonyHttpClientInterface::class));
+    }
+
+    private function client(): MockObject&SymfonyHttpClientInterface
+    {
+        if ($this->client === null) {
+            $this->client = $this->createMock(SymfonyHttpClientInterface::class);
+            $this->httpClient = new HttpClient($this->client);
+        }
+
+        self::assertInstanceOf(MockObject::class, $this->client);
+
+        return $this->client;
     }
 
     /**
@@ -409,8 +445,9 @@ final class HttpClientTest extends TestCase
     private function invokeRetryAfterMicroseconds(ResponseInterface $response): ?int
     {
         $method = new ReflectionMethod(HttpClient::class, 'retryAfterMicroseconds');
+        $httpClient = new HttpClient($this->createStub(SymfonyHttpClientInterface::class));
 
-        $delay = $method->invoke($this->httpClient, $response);
+        $delay = $method->invoke($httpClient, $response);
 
         if ($delay !== null && !is_int($delay)) {
             throw new RuntimeException('Unexpected retry delay type.');

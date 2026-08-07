@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit;
 
 use Aceproxies\ResellerApi\Client;
+use Aceproxies\ResellerApi\Endpoint\BalanceInterface;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Response\BalanceResponse;
 use Aceproxies\ResellerApi\Response\HealthResponse;
 use Aceproxies\ResellerApi\Response\VersionResponse;
 use InvalidArgumentException;
@@ -52,6 +54,24 @@ final class ClientTest extends TestCase
         $this->expectExceptionMessage('The HTTP request failed.');
 
         (new Client('token', $httpClient, 'https://example.test/'))->health()->getHealth();
+    }
+
+    public function testBalanceReturnsBalanceResponse(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/balance',
+                BalanceResponse::class,
+            )
+            ->willReturn(new BalanceResponse(18.59, 'USD'));
+
+        $balance = (new Client('token', $httpClient, 'https://example.test/'))->balance();
+
+        self::assertInstanceOf(BalanceInterface::class, $balance);
+        self::assertSame(18.59, $balance->getBalance()->balance);
     }
 
     public function testGetApiVersionReturnsVersion(): void
