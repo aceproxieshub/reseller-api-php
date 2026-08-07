@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Endpoint\Health;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Response\VersionResponse;
 use InvalidArgumentException;
 use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
 
@@ -32,5 +33,16 @@ final readonly class Client implements ClientInterface
     public function health(): HealthInterface
     {
         return new Health($this->httpClient, $this->baseUrl);
+    }
+
+    public function getApiVersion(): string
+    {
+        $response = $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/version',
+            VersionResponse::class,
+        );
+
+        return $response->version;
     }
 }
