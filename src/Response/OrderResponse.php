@@ -6,7 +6,7 @@ namespace Aceproxies\ResellerApi\Response;
 
 use DateTimeImmutable;
 
-final readonly class OrderDetailsResponse
+final readonly class OrderResponse
 {
     public DateTimeImmutable $createdAt;
 
@@ -16,12 +16,12 @@ final readonly class OrderDetailsResponse
      * @param array{amount: float|int, currency: string} $total
      */
     public function __construct(
-        string $createdAt,
-        public string $description,
         public string $id,
-        public bool $isRecurring,
         public string $status,
+        public string $description,
         array $total,
+        string $createdAt,
+        public bool $isRecurring,
     ) {
         $this->createdAt = new DateTimeImmutable($createdAt);
         $this->total = new MoneyResponse($total['amount'], $total['currency']);

@@ -9,8 +9,8 @@ use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Request\CreateOrderRequest;
 use Aceproxies\ResellerApi\Response\CreateOrderResponse;
-use Aceproxies\ResellerApi\Response\OrderDetailsResponse;
 use Aceproxies\ResellerApi\Response\OrderListResponse;
+use Aceproxies\ResellerApi\Response\OrderResponse;
 use InvalidArgumentException;
 
 interface OrdersInterface
@@ -36,5 +36,5 @@ interface OrdersInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function get(string $id): OrderDetailsResponse;
+    public function get(string $id): OrderResponse;
 }

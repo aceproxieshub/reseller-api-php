@@ -9,8 +9,8 @@ use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\CreateOrderItem;
 use Aceproxies\ResellerApi\Request\CreateOrderRequest;
 use Aceproxies\ResellerApi\Response\CreateOrderResponse;
-use Aceproxies\ResellerApi\Response\OrderDetailsResponse;
 use Aceproxies\ResellerApi\Response\OrderListResponse;
+use Aceproxies\ResellerApi\Response\OrderResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -80,15 +80,15 @@ final class OrdersTest extends TestCase
             ->with(
                 HttpClientInterface::METHOD_GET,
                 'https://example.test/api/v1/orders/order%2F1',
-                OrderDetailsResponse::class,
+                OrderResponse::class,
             )
-            ->willReturn(new OrderDetailsResponse(
-                '2026-08-08T12:00:00+00:00',
-                'Order description',
-                'order/1',
-                false,
-                'completed',
-                ['amount' => 18.59, 'currency' => 'USD'],
+            ->willReturn(new OrderResponse(
+                id: 'order/1',
+                status: 'completed',
+                description: 'Order description',
+                total: ['amount' => 18.59, 'currency' => 'USD'],
+                createdAt: '2026-08-08T12:00:00+00:00',
+                isRecurring: false,
             ));
 
         $result = (new Orders($httpClient, 'https://example.test///'))->get('order/1');

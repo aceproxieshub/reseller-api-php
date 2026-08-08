@@ -11,9 +11,9 @@ final readonly class CreateOrderResponse
     public readonly DateTimeImmutable $createdAt;
 
     public function __construct(
-        string $createdAt,
         public string $id,
         public string $status,
+        string $createdAt,
     ) {
         $this->createdAt = new DateTimeImmutable($createdAt);
     }

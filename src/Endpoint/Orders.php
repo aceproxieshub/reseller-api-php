@@ -10,8 +10,8 @@ use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\CreateOrderRequest;
 use Aceproxies\ResellerApi\Response\CreateOrderResponse;
-use Aceproxies\ResellerApi\Response\OrderDetailsResponse;
 use Aceproxies\ResellerApi\Response\OrderListResponse;
+use Aceproxies\ResellerApi\Response\OrderResponse;
 use InvalidArgumentException;
 
 final readonly class Orders implements OrdersInterface
@@ -76,7 +76,7 @@ final readonly class Orders implements OrdersInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function get(string $id): OrderDetailsResponse
+    public function get(string $id): OrderResponse
     {
         if ($id === '') {
             throw new InvalidArgumentException('The order ID must not be empty.');
@@ -85,7 +85,7 @@ final readonly class Orders implements OrdersInterface
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
             rtrim($this->baseUrl, '/') . '/api/v1/orders/' . rawurlencode($id),
-            OrderDetailsResponse::class,
+            OrderResponse::class,
         );
     }
 
