@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit;
 use Aceproxies\ResellerApi\Client;
 use Aceproxies\ResellerApi\Endpoint\BalanceInterface;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
+use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\BalanceResponse;
@@ -72,6 +73,13 @@ final class ClientTest extends TestCase
 
         self::assertInstanceOf(BalanceInterface::class, $balance);
         self::assertSame(18.59, $balance->getBalance()->balance);
+    }
+
+    public function testOrdersReturnsOrdersEndpoint(): void
+    {
+        $client = new Client('token', $this->createStub(HttpClientInterface::class), 'https://example.test/');
+
+        self::assertInstanceOf(OrdersInterface::class, $client->orders());
     }
 
     public function testGetApiVersionReturnsVersion(): void

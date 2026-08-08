@@ -1,0 +1,129 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
+
+use Aceproxies\ResellerApi\Endpoint\Orders;
+use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\CreateOrderItem;
+use Aceproxies\ResellerApi\Request\CreateOrderRequest;
+use Aceproxies\ResellerApi\Response\CreateOrderResponse;
+use Aceproxies\ResellerApi\Response\OrderDetailsResponse;
+use Aceproxies\ResellerApi\Response\OrderListResponse;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+
+final class OrdersTest extends TestCase
+{
+    public function testListsOrdersWithOptionalPagination(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/orders?page=1&limit=25',
+                OrderListResponse::class,
+            )
+            ->willReturn(new OrderListResponse([], 25, 1));
+
+        $result = (new Orders($httpClient, 'https://example.test///'))->list(1, 25);
+
+        self::assertSame(1, $result->page);
+        self::assertSame(25, $result->limit);
+    }
+
+    public function testCreatesOrderWithJsonPayload(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_POST,
+                'https://example.test/api/v1/orders',
+                CreateOrderResponse::class,
+                [
+                    'json' => [
+                        'items' => [[
+                            'productId' => 'product-1',
+                    'quantity' => 1,
+                            'durationId' => 'duration-1',
+                            'addons' => ['staticIp' => true],
+                            'options' => ['country' => 'DE'],
+                        ]],
+                    ],
+                ],
+            )
+            ->willReturn(new CreateOrderResponse('2026-08-08T12:00:00+00:00', 'order-1', 'created'));
+
+        $result = (new Orders($httpClient, 'https://example.test/'))->create(
+            new CreateOrderRequest([
+                new CreateOrderItem(
+                    'product-1',
+                    1,
+                    'duration-1',
+                    ['staticIp' => true],
+                    ['country' => 'DE'],
+                ),
+            ]),
+        );
+
+        self::assertSame('order-1', $result->id);
+    }
+
+    public function testGetsOrderDetails(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/orders/order%2F1',
+                OrderDetailsResponse::class,
+            )
+            ->willReturn(new OrderDetailsResponse(
+                '2026-08-08T12:00:00+00:00',
+                'Order description',
+                'order/1',
+                false,
+                'completed',
+                ['amount' => 18.59, 'currency' => 'USD'],
+            ));
+
+        $result = (new Orders($httpClient, 'https://example.test///'))->get('order/1');
+
+        self::assertSame('order/1', $result->id);
+        self::assertSame(18.59, $result->total->amount);
+    }
+
+    public function testPaginationMustBePositive(): void
+    {
+        $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Page must be greater than zero.');
+
+        $orders->list(0);
+    }
+
+    public function testLimitMustBePositive(): void
+    {
+        $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Limit must be greater than zero.');
+
+        $orders->list(limit: 0);
+    }
+
+    public function testOrderIdMustNotBeEmpty(): void
+    {
+        $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The order ID must not be empty.');
+
+        $orders->get('');
+    }
+}
