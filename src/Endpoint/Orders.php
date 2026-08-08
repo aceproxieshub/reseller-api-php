@@ -26,6 +26,7 @@ final readonly class Orders implements OrdersInterface
      * @throws ApiException
      * @throws InvalidResponseException
      * @throws TransportException
+     * @throws InvalidArgumentException
      */
     public function list(?int $page = null, ?int $limit = null): OrderListResponse
     {
@@ -73,6 +74,7 @@ final readonly class Orders implements OrdersInterface
      * @throws ApiException
      * @throws InvalidResponseException
      * @throws TransportException
+     * @throws InvalidArgumentException
      */
     public function get(string $id): OrderDetailsResponse
     {

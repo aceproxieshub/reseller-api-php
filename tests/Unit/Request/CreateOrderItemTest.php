@@ -12,10 +12,12 @@ final class CreateOrderItemTest extends TestCase
 {
     public function testProductIdMustNotBeEmpty(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The product ID must not be empty.');
-
-        new CreateOrderItem('', 1);
+        try {
+            new CreateOrderItem('', 1);
+            self::fail('Expected InvalidArgumentException.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('The product ID must not be empty.', $exception->getMessage());
+        }
     }
 
     public function testOptionalDurationIsOmittedFromPayloadWhenUnset(): void
@@ -33,9 +35,11 @@ final class CreateOrderItemTest extends TestCase
 
     public function testQuantityMustBePositive(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The order item quantity must be greater than zero.');
-
-        new CreateOrderItem('product-1', 0);
+        try {
+            new CreateOrderItem('product-1', 0);
+            self::fail('Expected InvalidArgumentException.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('The order item quantity must be greater than zero.', $exception->getMessage());
+        }
     }
 }

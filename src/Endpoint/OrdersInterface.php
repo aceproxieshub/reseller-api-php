@@ -11,6 +11,7 @@ use Aceproxies\ResellerApi\Request\CreateOrderRequest;
 use Aceproxies\ResellerApi\Response\CreateOrderResponse;
 use Aceproxies\ResellerApi\Response\OrderDetailsResponse;
 use Aceproxies\ResellerApi\Response\OrderListResponse;
+use InvalidArgumentException;
 
 interface OrdersInterface
 {
@@ -18,6 +19,7 @@ interface OrdersInterface
      * @throws ApiException
      * @throws InvalidResponseException
      * @throws TransportException
+     * @throws InvalidArgumentException
      */
     public function list(?int $page = null, ?int $limit = null): OrderListResponse;
 
@@ -32,6 +34,7 @@ interface OrdersInterface
      * @throws ApiException
      * @throws InvalidResponseException
      * @throws TransportException
+     * @throws InvalidArgumentException
      */
     public function get(string $id): OrderDetailsResponse;
 }

@@ -101,29 +101,35 @@ final class OrdersTest extends TestCase
     {
         $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Page must be greater than zero.');
-
-        $orders->list(0);
+        try {
+            $orders->list(0);
+            self::fail('Expected InvalidArgumentException.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Page must be greater than zero.', $exception->getMessage());
+        }
     }
 
     public function testLimitMustBePositive(): void
     {
         $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Limit must be greater than zero.');
-
-        $orders->list(limit: 0);
+        try {
+            $orders->list(limit: 0);
+            self::fail('Expected InvalidArgumentException.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('Limit must be greater than zero.', $exception->getMessage());
+        }
     }
 
     public function testOrderIdMustNotBeEmpty(): void
     {
         $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The order ID must not be empty.');
-
-        $orders->get('');
+        try {
+            $orders->get('');
+            self::fail('Expected InvalidArgumentException.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('The order ID must not be empty.', $exception->getMessage());
+        }
     }
 }
