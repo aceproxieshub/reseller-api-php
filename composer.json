@@ -1,6 +1,8 @@
 {
     "name": "aceproxieshub/reseller-api-php",
+    "description": "PHP API library for the Aceproxies reseller API",
     "type": "library",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Aceproxies\\ResellerApi\\": "src/"
