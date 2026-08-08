@@ -8,6 +8,8 @@ use Aceproxies\ResellerApi\Endpoint\Balance;
 use Aceproxies\ResellerApi\Endpoint\BalanceInterface;
 use Aceproxies\ResellerApi\Endpoint\Health;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
+use Aceproxies\ResellerApi\Endpoint\Orders;
+use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\VersionResponse;
@@ -40,6 +42,11 @@ final readonly class Client implements ClientInterface
     public function balance(): BalanceInterface
     {
         return new Balance($this->httpClient, $this->baseUrl);
+    }
+
+    public function orders(): OrdersInterface
+    {
+        return new Orders($this->httpClient, $this->baseUrl);
     }
 
     public function getApiVersion(): string

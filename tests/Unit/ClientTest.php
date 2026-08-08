@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit;
 use Aceproxies\ResellerApi\Client;
 use Aceproxies\ResellerApi\Endpoint\BalanceInterface;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
+use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\BalanceResponse;
@@ -19,10 +20,12 @@ final class ClientTest extends TestCase
 {
     public function testEmptyTokenThrowsInvalidArgumentException(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The API token must not be empty.');
-
-        new Client('');
+        try {
+            new Client('');
+            self::fail('Expected InvalidArgumentException.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertSame('The API token must not be empty.', $exception->getMessage());
+        }
     }
 
     public function testHealthReturnsHealthResponse(): void
@@ -38,9 +41,10 @@ final class ClientTest extends TestCase
             ->willReturn(new HealthResponse('ok'));
 
         $health = (new Client('token', $httpClient, 'https://example.test/'))->health();
+        $response = $health->getHealth();
 
         self::assertInstanceOf(HealthInterface::class, $health);
-        self::assertSame('ok', $health->getHealth()->status);
+        self::assertSame('ok', $response->status);
     }
 
     public function testHealthPropagatesTransportException(): void
@@ -50,10 +54,12 @@ final class ClientTest extends TestCase
             ->method('request')
             ->willThrowException(new TransportException('The HTTP request failed.'));
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('The HTTP request failed.');
-
-        (new Client('token', $httpClient, 'https://example.test/'))->health()->getHealth();
+        try {
+            (new Client('token', $httpClient, 'https://example.test/'))->health()->getHealth();
+            self::fail('Expected TransportException.');
+        } catch (TransportException $exception) {
+            self::assertSame('The HTTP request failed.', $exception->getMessage());
+        }
     }
 
     public function testBalanceReturnsBalanceResponse(): void
@@ -69,9 +75,17 @@ final class ClientTest extends TestCase
             ->willReturn(new BalanceResponse(18.59, 'USD'));
 
         $balance = (new Client('token', $httpClient, 'https://example.test/'))->balance();
+        $response = $balance->getBalance();
 
         self::assertInstanceOf(BalanceInterface::class, $balance);
-        self::assertSame(18.59, $balance->getBalance()->balance);
+        self::assertSame(18.59, $response->balance);
+    }
+
+    public function testOrdersReturnsOrdersEndpoint(): void
+    {
+        $client = new Client('token', $this->createStub(HttpClientInterface::class), 'https://example.test/');
+
+        self::assertInstanceOf(OrdersInterface::class, $client->orders());
     }
 
     public function testGetApiVersionReturnsVersion(): void
@@ -86,10 +100,9 @@ final class ClientTest extends TestCase
             )
             ->willReturn(new VersionResponse('reseller-api', '0.3.5+3509d25'));
 
-        self::assertSame(
-            '0.3.5+3509d25',
-            (new Client('token', $httpClient, 'https://example.test///'))->getApiVersion(),
-        );
+        $version = (new Client('token', $httpClient, 'https://example.test///'))->getApiVersion();
+
+        self::assertSame('0.3.5+3509d25', $version);
     }
 
     public function testGetApiVersionPropagatesTransportException(): void
@@ -99,9 +112,11 @@ final class ClientTest extends TestCase
             ->method('request')
             ->willThrowException(new TransportException('The HTTP request failed.'));
 
-        $this->expectException(TransportException::class);
-        $this->expectExceptionMessage('The HTTP request failed.');
-
-        (new Client('token', $httpClient))->getApiVersion();
+        try {
+            (new Client('token', $httpClient))->getApiVersion();
+            self::fail('Expected TransportException.');
+        } catch (TransportException $exception) {
+            self::assertSame('The HTTP request failed.', $exception->getMessage());
+        }
     }
 }

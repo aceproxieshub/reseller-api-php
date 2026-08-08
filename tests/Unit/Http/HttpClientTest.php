@@ -172,12 +172,16 @@ final class HttpClientTest extends TestCase
             ->method('request')
             ->willReturn($response);
 
-        $this->expectException(ApiException::class);
-        $this->httpClient->request(
-            method: HttpClientInterface::METHOD_GET,
-            url: 'https://example.test/health',
-            responseClass: HealthResponse::class,
-        );
+        try {
+            $this->httpClient->request(
+                method: HttpClientInterface::METHOD_GET,
+                url: 'https://example.test/health',
+                responseClass: HealthResponse::class,
+            );
+            self::fail('Expected ApiException.');
+        } catch (ApiException $exception) {
+            self::assertSame('Redirect', $exception->getMessage());
+        }
     }
 
     public function testServerErrorIsRetriedAndCanSucceed(): void
@@ -358,12 +362,16 @@ final class HttpClientTest extends TestCase
             ->method('request')
             ->willReturn($response);
 
-        $this->expectException(ApiException::class);
-        $this->httpClient->request(
-            method: HttpClientInterface::METHOD_GET,
-            url: 'https://example.test/health',
-            responseClass: HealthResponse::class,
-        );
+        try {
+            $this->httpClient->request(
+                method: HttpClientInterface::METHOD_GET,
+                url: 'https://example.test/health',
+                responseClass: HealthResponse::class,
+            );
+            self::fail('Expected ApiException.');
+        } catch (ApiException $exception) {
+            self::assertSame('Unavailable', $exception->getMessage());
+        }
     }
 
     public function testTransportFailureIsRetriedAndCanSucceed(): void

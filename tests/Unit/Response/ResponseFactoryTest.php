@@ -6,6 +6,8 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Response;
 
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Response\HealthResponse;
+use Aceproxies\ResellerApi\Response\OrderListResponse;
+use Aceproxies\ResellerApi\Response\OrderResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use JsonException;
 use PHPUnit\Framework\TestCase;
@@ -92,6 +94,33 @@ final class ResponseFactoryTest extends TestCase
         $response = $this->factory->create('{"data":{}}', EmptyResponse::class, 200);
 
         self::assertInstanceOf(EmptyResponse::class, $response);
+    }
+
+    public function testCreatesOrderListWithNestedTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"items":[{"createdAt":"2026-08-08T12:00:00+00:00","description":"Order","id":"order-1","isRecurring":false,"status":"completed","total":{"amount":18.59,"currency":"USD"}}],"limit":25,"page":2}}',
+            OrderListResponse::class,
+            200,
+        );
+
+        self::assertCount(1, $response->items);
+        self::assertSame('order-1', $response->items[0]->id);
+        self::assertFalse($response->items[0]->isRecurring);
+        self::assertSame(18.59, $response->items[0]->total->amount);
+        self::assertSame('+00:00', $response->items[0]->createdAt->getTimezone()->getName());
+    }
+
+    public function testCreatesOrderDetailsWithNestedTypedResponse(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"createdAt":"2026-08-08T12:00:00+00:00","description":"Order","id":"order-1","isRecurring":false,"status":"completed","total":{"amount":18.59,"currency":"USD"}}}',
+            OrderResponse::class,
+            200,
+        );
+
+        self::assertFalse($response->isRecurring);
+        self::assertSame('USD', $response->total->currency);
     }
 
     public function testSupportsJsonAtConfiguredMaximumDepth(): void

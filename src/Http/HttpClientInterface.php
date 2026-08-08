@@ -22,6 +22,7 @@ interface HttpClientInterface
     public const int HTTP_SERVICE_UNAVAILABLE = 503;
 
     public const string METHOD_GET = 'GET';
+    public const string METHOD_POST = 'POST';
 
     public const string HEADER_ACCEPT = 'Accept';
     public const string HEADER_ACCEPT_JSON = 'application/json';
