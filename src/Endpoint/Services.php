@@ -8,6 +8,8 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\UpdateServiceRequest;
+use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
@@ -77,5 +79,23 @@ final readonly class Services implements ServicesInterface
 
             throw $exception;
         }
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function update(string $code, UpdateServiceRequest $request): void
+    {
+        Assert::nonEmptyString($code, 'service code');
+
+        $this->httpClient->request(
+            HttpClientInterface::METHOD_PATCH,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($code),
+            EmptyResponse::class,
+            ['json' => $request->toArray()],
+        );
     }
 }
