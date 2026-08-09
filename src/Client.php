@@ -10,6 +10,8 @@ use Aceproxies\ResellerApi\Endpoint\Health;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
 use Aceproxies\ResellerApi\Endpoint\Orders;
 use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
+use Aceproxies\ResellerApi\Endpoint\Products;
+use Aceproxies\ResellerApi\Endpoint\ProductsInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\VersionResponse;
@@ -47,6 +49,11 @@ final readonly class Client implements ClientInterface
     public function orders(): OrdersInterface
     {
         return new Orders($this->httpClient, $this->baseUrl);
+    }
+
+    public function products(): ProductsInterface
+    {
+        return new Products($this->httpClient, $this->baseUrl);
     }
 
     public function getApiVersion(): string

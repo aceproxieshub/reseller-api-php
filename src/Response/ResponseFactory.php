@@ -30,15 +30,21 @@ final readonly class ResponseFactory
             $arguments = [];
 
             if ($constructor !== null) {
-                foreach ($constructor->getParameters() as $parameter) {
-                    $name = $parameter->getName();
+                $parameters = $constructor->getParameters();
 
-                    if (array_key_exists($name, $data)) {
-                        $arguments[] = $data[$name];
-                    } elseif ($parameter->isDefaultValueAvailable()) {
-                        $arguments[] = $parameter->getDefaultValue();
-                    } else {
-                        throw new InvalidResponseException($statusCode, $body);
+                if (array_is_list($data) && count($parameters) === 1 && $parameters[0]->getName() === 'data') {
+                    $arguments[] = $data;
+                } else {
+                    foreach ($parameters as $parameter) {
+                        $name = $parameter->getName();
+
+                        if (array_key_exists($name, $data)) {
+                            $arguments[] = $data[$name];
+                        } elseif ($parameter->isDefaultValueAvailable()) {
+                            $arguments[] = $parameter->getDefaultValue();
+                        } else {
+                            throw new InvalidResponseException($statusCode, $body);
+                        }
                     }
                 }
             }
