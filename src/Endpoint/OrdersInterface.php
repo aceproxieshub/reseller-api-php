@@ -36,5 +36,5 @@ interface OrdersInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function get(string $id): OrderResponse;
+    public function find(string $id): ?OrderResponse;
 }

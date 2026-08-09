@@ -77,14 +77,22 @@ final readonly class Orders implements OrdersInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function get(string $id): OrderResponse
+    public function find(string $id): ?OrderResponse
     {
         Assert::nonEmptyString($id, 'order ID');
 
-        return $this->httpClient->request(
-            HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/orders/' . rawurlencode($id),
-            OrderResponse::class,
-        );
+        try {
+            return $this->httpClient->request(
+                HttpClientInterface::METHOD_GET,
+                rtrim($this->baseUrl, '/') . '/api/v1/orders/' . rawurlencode($id),
+                OrderResponse::class,
+            );
+        } catch (ApiException $exception) {
+            if ($exception->statusCode === HttpClientInterface::HTTP_NOT_FOUND) {
+                return null;
+            }
+
+            throw $exception;
+        }
     }
 }

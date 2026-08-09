@@ -8,6 +8,7 @@ use InvalidArgumentException;
 
 final readonly class Assert
 {
+    /** @codeCoverageIgnore */
     private function __construct()
     {
     }

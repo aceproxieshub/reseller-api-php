@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Orders;
+use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\CreateOrderItem;
 use Aceproxies\ResellerApi\Request\CreateOrderRequest;
@@ -72,7 +73,7 @@ final class OrdersTest extends TestCase
         self::assertSame('order-1', $result->id);
     }
 
-    public function testGetsOrderDetails(): void
+    public function testFindsOrderDetails(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
         $httpClient->expects(self::once())
@@ -91,10 +92,36 @@ final class OrdersTest extends TestCase
                 isRecurring: false,
             ));
 
-        $result = (new Orders($httpClient, 'https://example.test///'))->get('order/1');
+        $result = (new Orders($httpClient, 'https://example.test///'))->find('order/1');
 
+        self::assertNotNull($result);
         self::assertSame('order/1', $result->id);
         self::assertSame(18.59, $result->total->amount);
+    }
+
+    public function testFindReturnsNullWhenOrderIsNotFound(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException(new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}'));
+
+        $result = (new Orders($httpClient, 'https://example.test/'))->find('order-1');
+
+        self::assertNull($result);
+    }
+
+    public function testFindPropagatesNonNotFoundApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_UNAUTHORIZED, 'Unauthorized', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Orders($httpClient, 'https://example.test/'))->find('order-1');
     }
 
     public function testPaginationMustBePositive(): void
@@ -126,7 +153,7 @@ final class OrdersTest extends TestCase
         $orders = new Orders($this->createStub(HttpClientInterface::class), 'https://example.test');
 
         try {
-            $orders->get('');
+            $orders->find('');
             self::fail('Expected InvalidArgumentException.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame('The order ID must not be empty.', $exception->getMessage());

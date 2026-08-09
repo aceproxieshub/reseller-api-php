@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Services;
+use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -63,5 +65,76 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject(new InvalidArgumentException('The limit must be greater than zero.'));
 
         $services->list(limit: 0);
+    }
+
+    public function testFindsServiceDetails(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1',
+                ServiceDetailResponse::class,
+            )
+            ->willReturn($this->serviceDetails());
+
+        $result = (new Services($httpClient, 'https://example.test///'))->find('service/1');
+
+        self::assertNotNull($result);
+        self::assertSame('service/1', $result->code);
+        self::assertSame(850, $result->orderId);
+    }
+
+    public function testFindReturnsNullWhenServiceIsNotFound(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException(new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}'));
+
+        self::assertNull((new Services($httpClient, 'https://example.test/'))->find('service-1'));
+    }
+
+    public function testFindPropagatesNonNotFoundApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_UNAUTHORIZED, 'Unauthorized', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test/'))->find('service-1');
+    }
+
+    public function testServiceCodeMustNotBeEmpty(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->find('');
+    }
+
+    private function serviceDetails(): ServiceDetailResponse
+    {
+        return new ServiceDetailResponse(
+            amount: ['amount' => 1, 'unit' => 'IP'],
+            auth: ['method' => 'ip'],
+            code: 'service/1',
+            createdAt: '2026-08-08T12:00:00+00:00',
+            startedAt: null,
+            expiresAt: null,
+            isRecurring: false,
+            orderId: 850,
+            orderUuid: 'order-uuid',
+            protocol: 'http',
+            price: ['amount' => 18.59, 'currency' => 'USD'],
+            serviceType: 'dc_proxy',
+            status: 'active',
+            userId: 'user-1',
+        );
     }
 }
