@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Residential proxy request lookup through `Client::services()->residential()->findProxyRequest()`
 - Residential proxy request creation through `Client::services()->residential()->createProxyRequest()`
 - Residential proxy request deletion through `Client::services()->residential()->deleteProxyRequest()`
+- Residential proxy list lookup through `Client::services()->residential()->getProxyList()`
 
 ### Changed
 

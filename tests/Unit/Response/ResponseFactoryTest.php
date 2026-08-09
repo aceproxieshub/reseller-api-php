@@ -15,6 +15,7 @@ use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
 use Aceproxies\ResellerApi\Response\Service\ServiceResponse;
@@ -224,6 +225,21 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame('request-1', $response->items[0]->id);
         self::assertSame(1, $response->items[0]->countryId);
         self::assertSame('2026-08-08 12:30:00', $response->items[0]->updatedAt->format('Y-m-d H:i:s'));
+    }
+
+    public function testCreatesResidentialProxyListWithTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"ip":"192.0.2.1","password":"secret","port":8080,"username":"proxy-user"}]}',
+            ProxyListResponse::class,
+            200,
+        );
+
+        self::assertCount(1, $response->items);
+        self::assertSame('192.0.2.1', $response->items[0]->ip);
+        self::assertSame('secret', $response->items[0]->password);
+        self::assertSame(8080, $response->items[0]->port);
+        self::assertSame('proxy-user', $response->items[0]->username);
     }
 
     public function testCreatesServiceWithOmittedNullableFields(): void

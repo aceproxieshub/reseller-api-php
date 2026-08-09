@@ -10,6 +10,7 @@ use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
@@ -128,6 +129,24 @@ final readonly class Residential implements ResidentialInterface
             HttpClientInterface::METHOD_DELETE,
             rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests/' . rawurlencode($id),
             ProxyRequestResponse::class,
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getProxyList(string $serviceCode, string $proxyRequestId): ProxyListResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+        Assert::nonEmptyString($proxyRequestId, 'proxy request ID');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($serviceCode) . '/proxy-requests/' . rawurlencode($proxyRequestId) . '/proxy-list',
+            ProxyListResponse::class,
         );
     }
 }
