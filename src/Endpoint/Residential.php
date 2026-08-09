@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
@@ -92,5 +93,23 @@ final readonly class Residential implements ResidentialInterface
 
             throw $exception;
         }
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function createProxyRequest(string $code, CreateProxyRequest $request): ProxyRequestResponse
+    {
+        Assert::nonEmptyString($code, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_POST,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests',
+            ProxyRequestResponse::class,
+            ['json' => $request->toArray()],
+        );
     }
 }

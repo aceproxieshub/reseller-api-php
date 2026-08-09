@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Residential;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
@@ -214,5 +215,66 @@ final class ResidentialTest extends TestCase
         self::expectExceptionObject($exception);
 
         (new Residential($httpClient, 'https://example.test'))->findProxyRequest('service-1', 'request-1');
+    }
+
+    public function testCreatesResidentialProxyRequest(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_POST,
+                'https://example.test/api/v1/services/residential/service%2F1/proxy-requests',
+                ProxyRequestResponse::class,
+                [
+                    'json' => [
+                        'countryId' => 1,
+                        'proxyCount' => 10,
+                        'rotationInterval' => 'all',
+                    ],
+                ],
+            )
+            ->willReturn(new ProxyRequestResponse(
+                countryId: 1,
+                createdAt: '2026-08-08T12:00:00+00:00',
+                id: 'request-1',
+                proxyCount: 10,
+                rotationInterval: 'all',
+                status: 'pending',
+                updatedAt: '2026-08-08T12:00:00+00:00',
+            ));
+
+        $response = (new Residential($httpClient, 'https://example.test///'))->createProxyRequest(
+            'service/1',
+            new CreateProxyRequest(1, 10, 'all'),
+        );
+
+        self::assertSame('request-1', $response->id);
+        self::assertSame('pending', $response->status);
+    }
+
+    public function testCreateProxyRequestRequiresAServiceCode(): void
+    {
+        $residential = new Residential($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $residential->createProxyRequest('', new CreateProxyRequest(1, 10, 'all'));
+    }
+
+    public function testCreateProxyRequestPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Residential($httpClient, 'https://example.test'))->createProxyRequest(
+            'service-1',
+            new CreateProxyRequest(1, 10, 'all'),
+        );
     }
 }
