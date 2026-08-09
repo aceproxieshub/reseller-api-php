@@ -37,4 +37,6 @@ interface ServicesInterface
      * @throws InvalidArgumentException
      */
     public function update(string $code, UpdateServiceRequest $request): void;
+
+    public function residential(): ResidentialInterface;
 }

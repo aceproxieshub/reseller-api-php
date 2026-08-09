@@ -9,6 +9,7 @@ use Aceproxies\ResellerApi\Endpoint\BalanceInterface;
 use Aceproxies\ResellerApi\Endpoint\HealthInterface;
 use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
 use Aceproxies\ResellerApi\Endpoint\ProductsInterface;
+use Aceproxies\ResellerApi\Endpoint\ResidentialInterface;
 use Aceproxies\ResellerApi\Endpoint\ServicesInterface;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
@@ -102,6 +103,13 @@ final class ClientTest extends TestCase
         $client = new Client('token', $this->createStub(HttpClientInterface::class), 'https://example.test/');
 
         self::assertInstanceOf(ServicesInterface::class, $client->services());
+    }
+
+    public function testServicesReturnsResidentialEndpoint(): void
+    {
+        $client = new Client('token', $this->createStub(HttpClientInterface::class), 'https://example.test/');
+
+        self::assertInstanceOf(ResidentialInterface::class, $client->services()->residential());
     }
 
     public function testGetApiVersionReturnsVersion(): void

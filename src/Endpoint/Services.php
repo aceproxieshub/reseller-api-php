@@ -98,4 +98,9 @@ final readonly class Services implements ServicesInterface
             ['json' => $request->toArray()],
         );
     }
+
+    public function residential(): ResidentialInterface
+    {
+        return new Residential($this->httpClient, $this->baseUrl);
+    }
 }
