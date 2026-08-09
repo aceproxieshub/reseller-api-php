@@ -8,8 +8,8 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\ProductListResponse;
-use Aceproxies\ResellerApi\Response\ProductTypesResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 
 final readonly class Products implements ProductsInterface
 {

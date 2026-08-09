@@ -8,10 +8,10 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Request\CreateOrderRequest;
-use Aceproxies\ResellerApi\Response\CreateOrderResponse;
-use Aceproxies\ResellerApi\Response\OrderListResponse;
-use Aceproxies\ResellerApi\Response\OrderResponse;
+use Aceproxies\ResellerApi\Request\Order\CreateOrderRequest;
+use Aceproxies\ResellerApi\Response\Order\CreateOrderResponse;
+use Aceproxies\ResellerApi\Response\Order\OrderListResponse;
+use Aceproxies\ResellerApi\Response\Order\OrderResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
 use InvalidArgumentException;
 

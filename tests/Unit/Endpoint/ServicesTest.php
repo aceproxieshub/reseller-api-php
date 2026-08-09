@@ -7,11 +7,11 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Request\UpdateServiceAuthPayload;
-use Aceproxies\ResellerApi\Request\UpdateServiceRequest;
+use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
+use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
-use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
-use Aceproxies\ResellerApi\Response\ServiceListResponse;
+use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -25,9 +25,9 @@ final class ServicesTest extends TestCase
             ->with(
                 HttpClientInterface::METHOD_GET,
                 'https://example.test/api/v1/services?page=2&limit=50',
-                ServiceListResponse::class,
+                ListResponse::class,
             )
-            ->willReturn(new ServiceListResponse([], 50, 2));
+            ->willReturn(new ListResponse([], 50, 2));
 
         $result = (new Services($httpClient, 'https://example.test///'))->list(2, 50);
 
@@ -43,9 +43,9 @@ final class ServicesTest extends TestCase
             ->with(
                 HttpClientInterface::METHOD_GET,
                 'https://example.test/api/v1/services',
-                ServiceListResponse::class,
+                ListResponse::class,
             )
-            ->willReturn(new ServiceListResponse([], 50, 1));
+            ->willReturn(new ListResponse([], 50, 1));
 
         $result = (new Services($httpClient, 'https://example.test/'))->list();
 
@@ -78,7 +78,7 @@ final class ServicesTest extends TestCase
             ->with(
                 HttpClientInterface::METHOD_GET,
                 'https://example.test/api/v1/services/service%2F1',
-                ServiceDetailResponse::class,
+                DetailResponse::class,
             )
             ->willReturn($this->serviceDetails());
 
@@ -168,9 +168,9 @@ final class ServicesTest extends TestCase
         $services->update('', new UpdateServiceRequest(protocol: 'http'));
     }
 
-    private function serviceDetails(): ServiceDetailResponse
+    private function serviceDetails(): DetailResponse
     {
-        return new ServiceDetailResponse(
+        return new DetailResponse(
             amount: ['amount' => 1, 'unit' => 'IP'],
             auth: ['method' => 'ip'],
             code: 'service/1',

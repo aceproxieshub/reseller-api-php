@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Response;
 
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
-use Aceproxies\ResellerApi\Response\HealthResponse;
-use Aceproxies\ResellerApi\Response\OrderListResponse;
-use Aceproxies\ResellerApi\Response\OrderResponse;
-use Aceproxies\ResellerApi\Response\ProductListResponse;
-use Aceproxies\ResellerApi\Response\ProductResponse;
-use Aceproxies\ResellerApi\Response\ProductTypesResponse;
+use Aceproxies\ResellerApi\Response\Health\HealthResponse;
+use Aceproxies\ResellerApi\Response\Order\OrderListResponse;
+use Aceproxies\ResellerApi\Response\Order\OrderResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
+use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
-use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
-use Aceproxies\ResellerApi\Response\ServiceListResponse;
-use Aceproxies\ResellerApi\Response\ServiceResponse;
+use Aceproxies\ResellerApi\Response\Service\ServiceResponse;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -167,7 +167,7 @@ final class ResponseFactoryTest extends TestCase
     {
         $response = $this->factory->create(
             '{"data":{"items":[{"code":"D32365E0C629B-170726","orderId":"019f6fae-623b-7142-a81f-238826fbd8dd","status":"active","amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"createdAt":"2026-07-17T10:45:27+00:00","startedAt":"2026-07-17T10:45:28+00:00","expiredAt":"2026-08-16T10:45:28+00:00"}],"limit":50,"page":1}}',
-            ServiceListResponse::class,
+            ListResponse::class,
             200,
         );
 
@@ -215,7 +215,7 @@ final class ResponseFactoryTest extends TestCase
     {
         $response = $this->factory->create(
             '{"data":{"items":[{"code":"service-1","orderId":"order-1","status":"pending"}],"limit":50,"page":1}}',
-            ServiceListResponse::class,
+            ListResponse::class,
             200,
         );
 
@@ -230,7 +230,7 @@ final class ResponseFactoryTest extends TestCase
     {
         $response = $this->factory->create(
             '{"data":{"amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"code":"CCD9F42D9TGMZ-040426","createdAt":"2026-08-08T12:00:00+00:00","expiresAt":null,"isRecurring":false,"orderId":850,"orderUuid":"0758a20a-b66e-4295-9131-cb9d0fd953f6","price":{"amount":18.59,"currency":"USD"},"protocol":"http","serviceType":"dc_proxy","startedAt":null,"status":"active","userId":"user-1"}}',
-            ServiceDetailResponse::class,
+            DetailResponse::class,
             200,
         );
 

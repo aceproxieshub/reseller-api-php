@@ -13,9 +13,9 @@ use Aceproxies\ResellerApi\Endpoint\ResidentialInterface;
 use Aceproxies\ResellerApi\Endpoint\ServicesInterface;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\BalanceResponse;
-use Aceproxies\ResellerApi\Response\HealthResponse;
-use Aceproxies\ResellerApi\Response\VersionResponse;
+use Aceproxies\ResellerApi\Response\Balance\BalanceResponse;
+use Aceproxies\ResellerApi\Response\Health\HealthResponse;
+use Aceproxies\ResellerApi\Response\Version\VersionResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

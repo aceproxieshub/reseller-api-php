@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Service;
 
-final readonly class ServiceAmountResponse
+final readonly class AmountResponse
 {
     public function __construct(
         public int $amount,

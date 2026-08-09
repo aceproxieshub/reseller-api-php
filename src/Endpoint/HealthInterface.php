@@ -7,7 +7,7 @@ namespace Aceproxies\ResellerApi\Endpoint;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
-use Aceproxies\ResellerApi\Response\HealthResponse;
+use Aceproxies\ResellerApi\Response\Health\HealthResponse;
 
 interface HealthInterface
 {

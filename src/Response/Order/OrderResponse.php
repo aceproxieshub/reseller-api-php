@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Order;
 
+use Aceproxies\ResellerApi\Response\MoneyResponse;
 use DateTimeImmutable;
 
 final readonly class OrderResponse

@@ -7,9 +7,9 @@ namespace Aceproxies\ResellerApi\Endpoint;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
-use Aceproxies\ResellerApi\Request\UpdateServiceRequest;
-use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
-use Aceproxies\ResellerApi\Response\ServiceListResponse;
+use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
+use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use InvalidArgumentException;
 
 interface ServicesInterface
@@ -20,7 +20,7 @@ interface ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function list(?int $page = null, ?int $limit = null): ServiceListResponse;
+    public function list(?int $page = null, ?int $limit = null): ListResponse;
 
     /**
      * @throws ApiException
@@ -28,7 +28,7 @@ interface ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function find(string $code): ?ServiceDetailResponse;
+    public function find(string $code): ?DetailResponse;
 
     /**
      * @throws ApiException

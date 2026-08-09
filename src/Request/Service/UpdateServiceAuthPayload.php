@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Request;
+namespace Aceproxies\ResellerApi\Request\Service;
 
 use Aceproxies\ResellerApi\Validation\Assert;
 

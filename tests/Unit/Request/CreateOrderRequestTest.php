@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Tests\Unit\Request;
 
-use Aceproxies\ResellerApi\Request\CreateOrderRequest;
+use Aceproxies\ResellerApi\Request\Order\CreateOrderRequest;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

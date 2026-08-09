@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Tests\Unit\Request;
 
-use Aceproxies\ResellerApi\Request\UpdateServiceAuthPayload;
-use Aceproxies\ResellerApi\Request\UpdateServiceRequest;
+use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
+use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

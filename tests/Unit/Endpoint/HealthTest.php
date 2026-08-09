@@ -6,7 +6,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Health;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\HealthResponse;
+use Aceproxies\ResellerApi\Response\Health\HealthResponse;
 use PHPUnit\Framework\TestCase;
 
 final class HealthTest extends TestCase
