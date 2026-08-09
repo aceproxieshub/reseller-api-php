@@ -51,7 +51,7 @@ final class ServicesTest extends TestCase
     {
         $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
 
-        $this->expectExceptionObject(new InvalidArgumentException('Page must be greater than zero.'));
+        self::expectExceptionObject(new InvalidArgumentException('The page must be greater than zero.'));
 
         $services->list(0);
     }
@@ -60,7 +60,7 @@ final class ServicesTest extends TestCase
     {
         $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
 
-        $this->expectExceptionObject(new InvalidArgumentException('Limit must be greater than zero.'));
+        self::expectExceptionObject(new InvalidArgumentException('The limit must be greater than zero.'));
 
         $services->list(limit: 0);
     }

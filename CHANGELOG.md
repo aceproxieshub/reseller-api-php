@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Orders list, creation, and details endpoint support
 - Products list and types endpoint support
 - Services list endpoint support
+- Validation\Assert utility for reusable input validation
 - Typed HealthResponse and HealthInterface
 - Library HttpClientInterface and Symfony-backed HTTP client
 - Generic response factory for API envelope and DTO hydration

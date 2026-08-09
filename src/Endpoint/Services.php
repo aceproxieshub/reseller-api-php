@@ -9,6 +9,7 @@ use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
+use Aceproxies\ResellerApi\Validation\Assert;
 use InvalidArgumentException;
 
 final readonly class Services implements ServicesInterface
@@ -30,12 +31,12 @@ final readonly class Services implements ServicesInterface
         $query = [];
 
         if ($page !== null) {
-            $this->assertPositive($page, 'Page');
+            Assert::positiveInteger($page, 'page');
             $query['page'] = $page;
         }
 
         if ($limit !== null) {
-            $this->assertPositive($limit, 'Limit');
+            Assert::positiveInteger($limit, 'limit');
             $query['limit'] = $limit;
         }
 
@@ -50,12 +51,5 @@ final readonly class Services implements ServicesInterface
             $url,
             ServiceListResponse::class,
         );
-    }
-
-    private function assertPositive(int $value, string $name): void
-    {
-        if ($value < 1) {
-            throw new InvalidArgumentException($name . ' must be greater than zero.');
-        }
     }
 }

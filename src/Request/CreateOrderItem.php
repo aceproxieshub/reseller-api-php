@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Request;
 
-use InvalidArgumentException;
+use Aceproxies\ResellerApi\Validation\Assert;
 
 final readonly class CreateOrderItem
 {
@@ -19,13 +19,8 @@ final readonly class CreateOrderItem
         public array $addons = [],
         public array $options = [],
     ) {
-        if ($this->productId === '') {
-            throw new InvalidArgumentException('The product ID must not be empty.');
-        }
-
-        if ($this->quantity < 1) {
-            throw new InvalidArgumentException('The order item quantity must be greater than zero.');
-        }
+        Assert::nonEmptyString($this->productId, 'product ID');
+        Assert::positiveInteger($this->quantity, 'order item quantity');
     }
 
     /**

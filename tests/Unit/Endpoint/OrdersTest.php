@@ -105,7 +105,7 @@ final class OrdersTest extends TestCase
             $orders->list(0);
             self::fail('Expected InvalidArgumentException.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Page must be greater than zero.', $exception->getMessage());
+            self::assertSame('The page must be greater than zero.', $exception->getMessage());
         }
     }
 
@@ -117,7 +117,7 @@ final class OrdersTest extends TestCase
             $orders->list(limit: 0);
             self::fail('Expected InvalidArgumentException.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('Limit must be greater than zero.', $exception->getMessage());
+            self::assertSame('The limit must be greater than zero.', $exception->getMessage());
         }
     }
 
