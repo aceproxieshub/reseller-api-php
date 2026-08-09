@@ -15,6 +15,7 @@ use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
 use Aceproxies\ResellerApi\Response\Service\ServiceResponse;
 use JsonException;
@@ -209,6 +210,20 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame('All traffic', $response->intervals['all']);
         self::assertSame('Every minute', $response->intervals['1min']);
         self::assertSame('Every 30 minutes', $response->intervals['30min']);
+    }
+
+    public function testCreatesResidentialProxyRequestsWithTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"countryId":1,"createdAt":"2026-08-08T12:00:00+00:00","id":"request-1","proxyCount":10,"rotationInterval":"all","status":"pending","updatedAt":"2026-08-08T12:30:00+00:00"}]}',
+            ProxyRequestsResponse::class,
+            200,
+        );
+
+        self::assertCount(1, $response->items);
+        self::assertSame('request-1', $response->items[0]->id);
+        self::assertSame(1, $response->items[0]->countryId);
+        self::assertSame('2026-08-08 12:30:00', $response->items[0]->updatedAt->format('Y-m-d H:i:s'));
     }
 
     public function testCreatesServiceWithOmittedNullableFields(): void

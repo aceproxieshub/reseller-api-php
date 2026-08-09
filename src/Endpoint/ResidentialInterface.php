@@ -8,7 +8,9 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
+use InvalidArgumentException;
 
 interface ResidentialInterface
 {
@@ -25,4 +27,12 @@ interface ResidentialInterface
      * @throws TransportException
      */
     public function rotationIntervals(): RotationIntervalsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function proxyRequests(string $code): ProxyRequestsResponse;
 }
