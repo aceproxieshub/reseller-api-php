@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
 use InvalidArgumentException;
@@ -35,4 +36,12 @@ interface ResidentialInterface
      * @throws InvalidArgumentException
      */
     public function proxyRequests(string $code): ProxyRequestsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function findProxyRequest(string $code, string $id): ?ProxyRequestResponse;
 }
