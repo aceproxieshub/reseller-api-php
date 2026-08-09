@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Services list endpoint support
 - Service detail lookup through `Client::services()->find()`
 - Service updates through `Client::services()->update()`
+- Residential service countries through `Client::services()->residential()->countries()`
 - Nullable `find()` lookups for Orders and Services when resources are not found
 - Validation\Assert utility for reusable input validation
 - Typed HealthResponse and HealthInterface

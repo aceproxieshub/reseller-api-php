@@ -11,6 +11,7 @@ use Aceproxies\ResellerApi\Response\OrderResponse;
 use Aceproxies\ResellerApi\Response\ProductListResponse;
 use Aceproxies\ResellerApi\Response\ProductResponse;
 use Aceproxies\ResellerApi\Response\ProductTypesResponse;
+use Aceproxies\ResellerApi\Response\ResidentialCountriesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
@@ -180,6 +181,20 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame('+00:00', $response->items[0]->createdAt?->getTimezone()->getName());
         self::assertSame(50, $response->limit);
         self::assertSame(1, $response->page);
+    }
+
+    public function testCreatesResidentialCountriesWithTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"id":1,"name":"United States","rotationIntervals":["all","1min"]}]}',
+            ResidentialCountriesResponse::class,
+            200,
+        );
+
+        self::assertCount(1, $response->items);
+        self::assertSame(1, $response->items[0]->id);
+        self::assertSame('United States', $response->items[0]->name);
+        self::assertSame(['all', '1min'], $response->items[0]->rotationIntervals);
     }
 
     public function testCreatesServiceWithOmittedNullableFields(): void
