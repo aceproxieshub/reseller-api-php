@@ -11,8 +11,9 @@ use Aceproxies\ResellerApi\Response\OrderResponse;
 use Aceproxies\ResellerApi\Response\ProductListResponse;
 use Aceproxies\ResellerApi\Response\ProductResponse;
 use Aceproxies\ResellerApi\Response\ProductTypesResponse;
-use Aceproxies\ResellerApi\Response\ResidentialCountriesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
+use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
 use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
 use Aceproxies\ResellerApi\Response\ServiceResponse;
@@ -187,7 +188,7 @@ final class ResponseFactoryTest extends TestCase
     {
         $response = $this->factory->create(
             '{"data":[{"id":1,"name":"United States","rotationIntervals":["all","1min"]}]}',
-            ResidentialCountriesResponse::class,
+            CountriesResponse::class,
             200,
         );
 
@@ -195,6 +196,19 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame(1, $response->items[0]->id);
         self::assertSame('United States', $response->items[0]->name);
         self::assertSame(['all', '1min'], $response->items[0]->rotationIntervals);
+    }
+
+    public function testCreatesResidentialRotationIntervals(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"all":"All traffic","high":"High rotation","1min":"Every minute","10min":"Every 10 minutes","30min":"Every 30 minutes"}}',
+            RotationIntervalsResponse::class,
+            200,
+        );
+
+        self::assertSame('All traffic', $response->intervals['all']);
+        self::assertSame('Every minute', $response->intervals['1min']);
+        self::assertSame('Every 30 minutes', $response->intervals['30min']);
     }
 
     public function testCreatesServiceWithOmittedNullableFields(): void

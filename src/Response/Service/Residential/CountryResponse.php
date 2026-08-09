@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Service\Residential;
 
-final readonly class ResidentialCountryResponse
+final readonly class CountryResponse
 {
     /**
      * @param list<string> $rotationIntervals

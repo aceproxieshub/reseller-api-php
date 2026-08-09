@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Service\Residential;
 
-final readonly class ResidentialCountriesResponse
+final readonly class CountriesResponse
 {
     /**
-     * @var list<ResidentialCountryResponse>
+     * @var list<CountryResponse>
      */
     public array $items;
 
@@ -17,7 +17,7 @@ final readonly class ResidentialCountriesResponse
     public function __construct(array $data)
     {
         $this->items = array_map(
-            static fn (array $country): ResidentialCountryResponse => new ResidentialCountryResponse(
+            static fn (array $country): CountryResponse => new CountryResponse(
                 id: $country['id'],
                 name: $country['name'],
                 rotationIntervals: $country['rotationIntervals'],
