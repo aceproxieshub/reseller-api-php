@@ -7,7 +7,8 @@ namespace Aceproxies\ResellerApi\Endpoint;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
-use Aceproxies\ResellerApi\Response\ResidentialCountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
+use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
 
 interface ResidentialInterface
 {
@@ -16,5 +17,12 @@ interface ResidentialInterface
      * @throws InvalidResponseException
      * @throws TransportException
      */
-    public function countries(): ResidentialCountriesResponse;
+    public function countries(): CountriesResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     */
+    public function rotationIntervals(): RotationIntervalsResponse;
 }

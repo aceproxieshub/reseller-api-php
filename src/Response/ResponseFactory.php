@@ -32,7 +32,7 @@ final readonly class ResponseFactory
             if ($constructor !== null) {
                 $parameters = $constructor->getParameters();
 
-                if (array_is_list($data) && count($parameters) === 1 && $parameters[0]->getName() === 'data') {
+                if (count($parameters) === 1 && $parameters[0]->getName() === 'data' && (array_is_list($data) || is_a($responseClass, AssociativeDataResponseInterface::class, true))) {
                     $arguments[] = $data;
                 } else {
                     foreach ($parameters as $parameter) {
