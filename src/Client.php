@@ -12,6 +12,8 @@ use Aceproxies\ResellerApi\Endpoint\Orders;
 use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
 use Aceproxies\ResellerApi\Endpoint\Products;
 use Aceproxies\ResellerApi\Endpoint\ProductsInterface;
+use Aceproxies\ResellerApi\Endpoint\Services;
+use Aceproxies\ResellerApi\Endpoint\ServicesInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\VersionResponse;
@@ -54,6 +56,11 @@ final readonly class Client implements ClientInterface
     public function products(): ProductsInterface
     {
         return new Products($this->httpClient, $this->baseUrl);
+    }
+
+    public function services(): ServicesInterface
+    {
+        return new Services($this->httpClient, $this->baseUrl);
     }
 
     public function getApiVersion(): string

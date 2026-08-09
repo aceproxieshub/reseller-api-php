@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Balance endpoint support with bearer authorization headers
 - Orders list, creation, and details endpoint support
 - Products list and types endpoint support
+- Services list endpoint support
 - Typed HealthResponse and HealthInterface
 - Library HttpClientInterface and Symfony-backed HTTP client
 - Generic response factory for API envelope and DTO hydration
