@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service updates through `Client::services()->update()`
 - Residential service countries through `Client::services()->residential()->countries()`
 - Residential rotation intervals through `Client::services()->residential()->rotationIntervals()`
+
+### Changed
+
+- Organized endpoint requests and responses into hierarchical namespaces; this is a breaking namespace change without compatibility aliases
 - Nullable `find()` lookups for Orders and Services when resources are not found
 - Validation\Assert utility for reusable input validation
 - Typed HealthResponse and HealthInterface

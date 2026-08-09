@@ -8,7 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\HealthResponse;
+use Aceproxies\ResellerApi\Response\Health\HealthResponse;
 
 final readonly class Health implements HealthInterface
 {

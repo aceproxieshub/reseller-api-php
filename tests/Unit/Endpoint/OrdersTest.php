@@ -7,11 +7,11 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Orders;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Request\CreateOrderItem;
-use Aceproxies\ResellerApi\Request\CreateOrderRequest;
-use Aceproxies\ResellerApi\Response\CreateOrderResponse;
-use Aceproxies\ResellerApi\Response\OrderListResponse;
-use Aceproxies\ResellerApi\Response\OrderResponse;
+use Aceproxies\ResellerApi\Request\Order\CreateOrderItem;
+use Aceproxies\ResellerApi\Request\Order\CreateOrderRequest;
+use Aceproxies\ResellerApi\Response\Order\CreateOrderResponse;
+use Aceproxies\ResellerApi\Response\Order\OrderListResponse;
+use Aceproxies\ResellerApi\Response\Order\OrderResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

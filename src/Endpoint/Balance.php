@@ -8,7 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\BalanceResponse;
+use Aceproxies\ResellerApi\Response\Balance\BalanceResponse;
 
 final readonly class Balance implements BalanceInterface
 {

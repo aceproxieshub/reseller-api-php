@@ -8,10 +8,10 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Request\UpdateServiceRequest;
+use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
-use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
-use Aceproxies\ResellerApi\Response\ServiceListResponse;
+use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
 use InvalidArgumentException;
 
@@ -29,7 +29,7 @@ final readonly class Services implements ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function list(?int $page = null, ?int $limit = null): ServiceListResponse
+    public function list(?int $page = null, ?int $limit = null): ListResponse
     {
         $query = [];
 
@@ -52,7 +52,7 @@ final readonly class Services implements ServicesInterface
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
             $url,
-            ServiceListResponse::class,
+            ListResponse::class,
         );
     }
 
@@ -62,7 +62,7 @@ final readonly class Services implements ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function find(string $code): ?ServiceDetailResponse
+    public function find(string $code): ?DetailResponse
     {
         Assert::nonEmptyString($code, 'service code');
 
@@ -70,7 +70,7 @@ final readonly class Services implements ServicesInterface
             return $this->httpClient->request(
                 HttpClientInterface::METHOD_GET,
                 rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($code),
-                ServiceDetailResponse::class,
+                DetailResponse::class,
             );
         } catch (ApiException $exception) {
             if ($exception->statusCode === HttpClientInterface::HTTP_NOT_FOUND) {

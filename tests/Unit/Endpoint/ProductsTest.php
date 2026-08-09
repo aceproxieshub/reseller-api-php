@@ -6,8 +6,8 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Products;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\ProductListResponse;
-use Aceproxies\ResellerApi\Response\ProductTypesResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 use PHPUnit\Framework\TestCase;
 
 final class ProductsTest extends TestCase

@@ -7,8 +7,8 @@ namespace Aceproxies\ResellerApi\Endpoint;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
-use Aceproxies\ResellerApi\Response\ProductListResponse;
-use Aceproxies\ResellerApi\Response\ProductTypesResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
+use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 
 interface ProductsInterface
 {

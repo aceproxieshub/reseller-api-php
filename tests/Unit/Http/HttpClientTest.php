@@ -9,7 +9,7 @@ use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
-use Aceproxies\ResellerApi\Response\HealthResponse;
+use Aceproxies\ResellerApi\Response\Health\HealthResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;

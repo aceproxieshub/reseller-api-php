@@ -16,7 +16,7 @@ use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Endpoint\ServicesInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
-use Aceproxies\ResellerApi\Response\VersionResponse;
+use Aceproxies\ResellerApi\Response\Version\VersionResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
 use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
 

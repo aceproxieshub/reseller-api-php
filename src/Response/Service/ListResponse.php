@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Service;
 
-final readonly class ServiceListResponse
+final readonly class ListResponse
 {
     /**
      * @var list<ServiceResponse>

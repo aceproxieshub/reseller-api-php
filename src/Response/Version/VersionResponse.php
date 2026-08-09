@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Version;
 
 final readonly class VersionResponse
 {

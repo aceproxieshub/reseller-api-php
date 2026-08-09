@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Aceproxies\ResellerApi\Response;
+namespace Aceproxies\ResellerApi\Response\Service;
 
 use DateTimeImmutable;
 
-final readonly class ServiceDetailResponse
+final readonly class DetailResponse
 {
-    public ServiceAmountResponse $amount;
+    public AmountResponse $amount;
 
-    public ServiceAuthResponse $auth;
+    public AuthResponse $auth;
 
     public DateTimeImmutable $createdAt;
 
@@ -18,7 +18,7 @@ final readonly class ServiceDetailResponse
 
     public ?DateTimeImmutable $expiresAt;
 
-    public ServicePriceResponse $price;
+    public PriceResponse $price;
 
     /**
      * @param array{amount: int, unit: string} $amount
@@ -41,11 +41,11 @@ final readonly class ServiceDetailResponse
         public string $status,
         public string $userId,
     ) {
-        $this->amount = new ServiceAmountResponse($amount['amount'], $amount['unit']);
-        $this->auth = new ServiceAuthResponse($auth['method']);
+        $this->amount = new AmountResponse($amount['amount'], $amount['unit']);
+        $this->auth = new AuthResponse($auth['method']);
         $this->createdAt = new DateTimeImmutable($createdAt);
         $this->startedAt = $startedAt === null ? null : new DateTimeImmutable($startedAt);
         $this->expiresAt = $expiresAt === null ? null : new DateTimeImmutable($expiresAt);
-        $this->price = new ServicePriceResponse($price['amount'], $price['currency']);
+        $this->price = new PriceResponse($price['amount'], $price['currency']);
     }
 }
