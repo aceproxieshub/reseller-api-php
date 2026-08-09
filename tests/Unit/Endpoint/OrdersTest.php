@@ -55,7 +55,7 @@ final class OrdersTest extends TestCase
                     ],
                 ],
             )
-            ->willReturn(new CreateOrderResponse('2026-08-08T12:00:00+00:00', 'order-1', 'created'));
+            ->willReturn(new CreateOrderResponse('order-1', 'created', '2026-08-08T12:00:00+00:00'));
 
         $result = (new Orders($httpClient, 'https://example.test/'))->create(
             new CreateOrderRequest([

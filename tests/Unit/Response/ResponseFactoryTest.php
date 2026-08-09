@@ -8,6 +8,9 @@ use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Response\HealthResponse;
 use Aceproxies\ResellerApi\Response\OrderListResponse;
 use Aceproxies\ResellerApi\Response\OrderResponse;
+use Aceproxies\ResellerApi\Response\ProductListResponse;
+use Aceproxies\ResellerApi\Response\ProductResponse;
+use Aceproxies\ResellerApi\Response\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use JsonException;
 use PHPUnit\Framework\TestCase;
@@ -58,6 +61,7 @@ final class ResponseFactoryTest extends TestCase
             $this->factory->create('{"data":{}}', HealthResponse::class, 200);
             self::fail('Expected InvalidResponseException.');
         } catch (InvalidResponseException $exception) {
+            self::assertSame(200, $exception->statusCode);
             self::assertNull($exception->getPrevious());
         }
     }
@@ -121,6 +125,67 @@ final class ResponseFactoryTest extends TestCase
 
         self::assertFalse($response->isRecurring);
         self::assertSame('USD', $response->total->currency);
+    }
+
+    public function testCreatesProductListWithNestedTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"addons":{"sticky":true},"durations":[{"durationDays":30,"id":"duration-1","name":"Monthly","price":18.59}],"id":"product-1","name":"Residential","options":{"country":"US"},"price":null,"type":"residential"},{"addons":[],"durations":null,"id":"product-2","name":"Datacenter","options":{},"price":5,"type":"datacenter"}]}',
+            ProductListResponse::class,
+            200,
+        );
+
+        self::assertCount(2, $response->items);
+        self::assertInstanceOf(ProductResponse::class, $response->items[0]);
+        self::assertSame('product-1', $response->items[0]->id);
+        self::assertNull($response->items[0]->price);
+        self::assertSame(['sticky' => true], $response->items[0]->addons);
+        self::assertSame('US', $response->items[0]->options['country']);
+        self::assertNotNull($response->items[0]->durations);
+        self::assertSame(30, $response->items[0]->durations[0]->durationDays);
+        self::assertSame(18.59, $response->items[0]->durations[0]->price);
+        self::assertNull($response->items[1]->durations);
+    }
+
+    public function testCreatesProductTypesResponse(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"types":["residential","datacenter"]}}',
+            ProductTypesResponse::class,
+            200,
+        );
+
+        self::assertSame(['residential', 'datacenter'], $response->types);
+    }
+
+    public function testMissingProductFieldThrowsInvalidResponseException(): void
+    {
+        try {
+            $this->factory->create(
+                '{"data":[{"addons":[],"durations":null,"id":"product-1","name":"Residential","options":{},"price":18.59,"type":[]}]}',
+                ProductListResponse::class,
+                200,
+            );
+            self::fail('Expected InvalidResponseException.');
+        } catch (InvalidResponseException $exception) {
+            self::assertSame(200, $exception->statusCode);
+            self::assertNotNull($exception->getPrevious());
+        }
+    }
+
+    public function testProductListRequiresArrayData(): void
+    {
+        try {
+            $this->factory->create(
+                '{"data":{"product-1":{"addons":[],"durations":null,"id":"product-1","name":"Residential","options":{},"price":18.59,"type":"residential"}}}',
+                ProductListResponse::class,
+                200,
+            );
+            self::fail('Expected InvalidResponseException.');
+        } catch (InvalidResponseException $exception) {
+            self::assertSame(200, $exception->statusCode);
+            self::assertNull($exception->getPrevious());
+        }
     }
 
     public function testSupportsJsonAtConfiguredMaximumDepth(): void
