@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Residential rotation intervals through `Client::services()->residential()->rotationIntervals()`
 - Residential proxy request listing through `Client::services()->residential()->proxyRequests()`
 - Residential proxy request lookup through `Client::services()->residential()->findProxyRequest()`
+- Residential proxy request creation through `Client::services()->residential()->createProxyRequest()`
 
 ### Changed
 
