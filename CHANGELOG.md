@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Residential service countries through `Client::services()->residential()->countries()`
 - Residential rotation intervals through `Client::services()->residential()->rotationIntervals()`
 - Residential proxy request listing through `Client::services()->residential()->proxyRequests()`
+- Residential proxy request lookup through `Client::services()->residential()->findProxyRequest()`
 
 ### Changed
 
