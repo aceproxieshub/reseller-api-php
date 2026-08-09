@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Request;
 
-use InvalidArgumentException;
+use Aceproxies\ResellerApi\Validation\Assert;
 
 final readonly class CreateOrderRequest
 {
@@ -13,9 +13,7 @@ final readonly class CreateOrderRequest
      */
     public function __construct(public array $items)
     {
-        if ($this->items === []) {
-            throw new InvalidArgumentException('An order must contain at least one item.');
-        }
+        Assert::nonEmptyArray($this->items, 'order items');
     }
 
     /**

@@ -16,7 +16,7 @@ final class CreateOrderRequestTest extends TestCase
             new CreateOrderRequest([]);
             self::fail('Expected InvalidArgumentException.');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('An order must contain at least one item.', $exception->getMessage());
+            self::assertSame('The order items must contain at least one item.', $exception->getMessage());
         }
     }
 }

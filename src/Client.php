@@ -12,10 +12,12 @@ use Aceproxies\ResellerApi\Endpoint\Orders;
 use Aceproxies\ResellerApi\Endpoint\OrdersInterface;
 use Aceproxies\ResellerApi\Endpoint\Products;
 use Aceproxies\ResellerApi\Endpoint\ProductsInterface;
+use Aceproxies\ResellerApi\Endpoint\Services;
+use Aceproxies\ResellerApi\Endpoint\ServicesInterface;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\VersionResponse;
-use InvalidArgumentException;
+use Aceproxies\ResellerApi\Validation\Assert;
 use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
 
 final readonly class Client implements ClientInterface
@@ -29,9 +31,7 @@ final readonly class Client implements ClientInterface
         ?HttpClientInterface $httpClient = null,
         private string $baseUrl = self::BASE_URL,
     ) {
-        if ($token === '') {
-            throw new InvalidArgumentException('The API token must not be empty.');
-        }
+        Assert::nonEmptyString($token, 'API token');
 
         $this->httpClient = $httpClient ?? new HttpClient(SymfonyHttpClient::create(), token: $token);
     }
@@ -54,6 +54,11 @@ final readonly class Client implements ClientInterface
     public function products(): ProductsInterface
     {
         return new Products($this->httpClient, $this->baseUrl);
+    }
+
+    public function services(): ServicesInterface
+    {
+        return new Services($this->httpClient, $this->baseUrl);
     }
 
     public function getApiVersion(): string

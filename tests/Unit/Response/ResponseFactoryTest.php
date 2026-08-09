@@ -12,6 +12,8 @@ use Aceproxies\ResellerApi\Response\ProductListResponse;
 use Aceproxies\ResellerApi\Response\ProductResponse;
 use Aceproxies\ResellerApi\Response\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
+use Aceproxies\ResellerApi\Response\ServiceListResponse;
+use Aceproxies\ResellerApi\Response\ServiceResponse;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -156,6 +158,42 @@ final class ResponseFactoryTest extends TestCase
         );
 
         self::assertSame(['residential', 'datacenter'], $response->types);
+    }
+
+    public function testCreatesServiceListWithNestedTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"items":[{"code":"D32365E0C629B-170726","orderId":"019f6fae-623b-7142-a81f-238826fbd8dd","status":"active","amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"createdAt":"2026-07-17T10:45:27+00:00","startedAt":"2026-07-17T10:45:28+00:00","expiredAt":"2026-08-16T10:45:28+00:00"}],"limit":50,"page":1}}',
+            ServiceListResponse::class,
+            200,
+        );
+
+        self::assertCount(1, $response->items);
+        self::assertInstanceOf(ServiceResponse::class, $response->items[0]);
+        self::assertSame('D32365E0C629B-170726', $response->items[0]->code);
+        self::assertSame('019f6fae-623b-7142-a81f-238826fbd8dd', $response->items[0]->orderId);
+        self::assertNotNull($response->items[0]->amount);
+        self::assertSame(1, $response->items[0]->amount->amount);
+        self::assertSame('IP', $response->items[0]->amount->unit);
+        self::assertSame('ip', $response->items[0]->auth?->method);
+        self::assertSame('+00:00', $response->items[0]->createdAt?->getTimezone()->getName());
+        self::assertSame(50, $response->limit);
+        self::assertSame(1, $response->page);
+    }
+
+    public function testCreatesServiceWithOmittedNullableFields(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"items":[{"code":"service-1","orderId":"order-1","status":"pending"}],"limit":50,"page":1}}',
+            ServiceListResponse::class,
+            200,
+        );
+
+        self::assertNull($response->items[0]->amount);
+        self::assertNull($response->items[0]->auth);
+        self::assertNull($response->items[0]->createdAt);
+        self::assertNull($response->items[0]->startedAt);
+        self::assertNull($response->items[0]->expiredAt);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void
