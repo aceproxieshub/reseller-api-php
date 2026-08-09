@@ -12,6 +12,7 @@ use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
+use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
@@ -258,6 +259,20 @@ final class ResponseFactoryTest extends TestCase
         self::assertNull($response->expiresAt);
         self::assertFalse($response->isRecurring);
         self::assertSame(850, $response->orderId);
+    }
+
+    public function testCreatesServiceBandwidthWithNestedTypedResponse(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"bandwidth":{"available":12.5,"total":100,"unit":"GB","used":87.5}}}',
+            BandwidthResponse::class,
+            200,
+        );
+
+        self::assertSame(12.5, $response->bandwidth->available);
+        self::assertSame(100, $response->bandwidth->total);
+        self::assertSame('GB', $response->bandwidth->unit);
+        self::assertSame(87.5, $response->bandwidth->used);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void

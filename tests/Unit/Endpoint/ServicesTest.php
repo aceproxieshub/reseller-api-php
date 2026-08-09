@@ -10,6 +10,7 @@ use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
+use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use InvalidArgumentException;
@@ -110,6 +111,64 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject($exception);
 
         (new Services($httpClient, 'https://example.test/'))->find('service-1');
+    }
+
+    public function testGetsServiceBandwidth(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/bandwidth',
+                BandwidthResponse::class,
+            )
+            ->willReturn(new BandwidthResponse([
+                'available' => 12.5,
+                'total' => 100,
+                'unit' => 'GB',
+                'used' => 87.5,
+            ]));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->getBandwidth('service/1');
+
+        self::assertNotNull($result);
+        self::assertSame(12.5, $result->bandwidth->available);
+        self::assertSame(100, $result->bandwidth->total);
+        self::assertSame('GB', $result->bandwidth->unit);
+        self::assertSame(87.5, $result->bandwidth->used);
+    }
+
+    public function testGetBandwidthReturnsNullWhenServiceIsNotFound(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException(new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}'));
+
+        self::assertNull((new Services($httpClient, 'https://example.test/'))->getBandwidth('service-1'));
+    }
+
+    public function testGetBandwidthPropagatesNonNotFoundApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_UNAUTHORIZED, 'Unauthorized', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test/'))->getBandwidth('service-1');
+    }
+
+    public function testGetBandwidthRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->getBandwidth('');
     }
 
     public function testServiceCodeMustNotBeEmpty(): void

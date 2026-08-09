@@ -10,6 +10,7 @@ use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
+use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
@@ -71,6 +72,31 @@ final readonly class Services implements ServicesInterface
                 HttpClientInterface::METHOD_GET,
                 rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($code),
                 DetailResponse::class,
+            );
+        } catch (ApiException $exception) {
+            if ($exception->statusCode === HttpClientInterface::HTTP_NOT_FOUND) {
+                return null;
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getBandwidth(string $serviceCode): ?BandwidthResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        try {
+            return $this->httpClient->request(
+                HttpClientInterface::METHOD_GET,
+                rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/bandwidth',
+                BandwidthResponse::class,
             );
         } catch (ApiException $exception) {
             if ($exception->statusCode === HttpClientInterface::HTTP_NOT_FOUND) {
