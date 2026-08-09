@@ -7,6 +7,9 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\UpdateServiceAuthPayload;
+use Aceproxies\ResellerApi\Request\UpdateServiceRequest;
+use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
 use InvalidArgumentException;
@@ -116,6 +119,53 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
         $services->find('');
+    }
+
+    public function testUpdatesServiceWithJsonPayload(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_PATCH,
+                'https://example.test/api/v1/services/service%2F1',
+                EmptyResponse::class,
+                ['json' => [
+                    'protocol' => 'http',
+                    'auth' => ['method' => 'ip'],
+                ]],
+            )
+            ->willReturn(new EmptyResponse());
+
+        (new Services($httpClient, 'https://example.test///'))->update(
+            'service/1',
+            new UpdateServiceRequest('http', new UpdateServiceAuthPayload('ip')),
+        );
+    }
+
+    public function testUpdatePropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test/'))->update(
+            'service-1',
+            new UpdateServiceRequest(protocol: 'http'),
+        );
+    }
+
+    public function testUpdateServiceCodeMustNotBeEmpty(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->update('', new UpdateServiceRequest(protocol: 'http'));
     }
 
     private function serviceDetails(): ServiceDetailResponse

@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\HealthResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -47,6 +48,20 @@ final class HttpClientTest extends TestCase
         );
 
         self::assertSame('ok', $result->status);
+    }
+
+    public function testSuccessfulEmptyResponseCanBeParsed(): void
+    {
+        $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{}}');
+        $this->client()->expects(self::once())->method('request')->willReturn($response);
+
+        $result = $this->httpClient->request(
+            method: HttpClientInterface::METHOD_PATCH,
+            url: 'https://example.test/services/service-1',
+            responseClass: EmptyResponse::class,
+        );
+
+        self::assertInstanceOf(EmptyResponse::class, $result);
     }
 
     public function testAuthenticatedRequestAddsBearerAuthorizationHeader(): void
