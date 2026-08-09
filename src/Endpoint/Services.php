@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
 use InvalidArgumentException;
@@ -51,5 +52,30 @@ final readonly class Services implements ServicesInterface
             $url,
             ServiceListResponse::class,
         );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function find(string $code): ?ServiceDetailResponse
+    {
+        Assert::nonEmptyString($code, 'service code');
+
+        try {
+            return $this->httpClient->request(
+                HttpClientInterface::METHOD_GET,
+                rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($code),
+                ServiceDetailResponse::class,
+            );
+        } catch (ApiException $exception) {
+            if ($exception->statusCode === HttpClientInterface::HTTP_NOT_FOUND) {
+                return null;
+            }
+
+            throw $exception;
+        }
     }
 }

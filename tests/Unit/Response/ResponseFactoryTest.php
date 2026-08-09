@@ -12,6 +12,7 @@ use Aceproxies\ResellerApi\Response\ProductListResponse;
 use Aceproxies\ResellerApi\Response\ProductResponse;
 use Aceproxies\ResellerApi\Response\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
+use Aceproxies\ResellerApi\Response\ServiceDetailResponse;
 use Aceproxies\ResellerApi\Response\ServiceListResponse;
 use Aceproxies\ResellerApi\Response\ServiceResponse;
 use JsonException;
@@ -194,6 +195,25 @@ final class ResponseFactoryTest extends TestCase
         self::assertNull($response->items[0]->createdAt);
         self::assertNull($response->items[0]->startedAt);
         self::assertNull($response->items[0]->expiredAt);
+    }
+
+    public function testCreatesServiceDetailsWithNestedTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"code":"CCD9F42D9TGMZ-040426","createdAt":"2026-08-08T12:00:00+00:00","expiresAt":null,"isRecurring":false,"orderId":850,"orderUuid":"0758a20a-b66e-4295-9131-cb9d0fd953f6","price":{"amount":18.59,"currency":"USD"},"protocol":"http","serviceType":"dc_proxy","startedAt":null,"status":"active","userId":"user-1"}}',
+            ServiceDetailResponse::class,
+            200,
+        );
+
+        self::assertSame('CCD9F42D9TGMZ-040426', $response->code);
+        self::assertSame(1, $response->amount->amount);
+        self::assertSame('ip', $response->auth->method);
+        self::assertSame(18.59, $response->price->amount);
+        self::assertSame('+00:00', $response->createdAt->getTimezone()->getName());
+        self::assertNull($response->startedAt);
+        self::assertNull($response->expiresAt);
+        self::assertFalse($response->isRecurring);
+        self::assertSame(850, $response->orderId);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void
