@@ -21,6 +21,7 @@ use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
+use Aceproxies\ResellerApi\Response\Service\ProxyListResponse as ServiceProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
@@ -386,6 +387,21 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame('2026-09-08', $response->newExpirationDate->format('Y-m-d'));
         self::assertSame(2, $response->quantity);
         self::assertSame('completed', $response->status);
+    }
+
+    public function testCreatesServiceProxyListWithTypedResponses(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"ip":"192.0.2.1","password":"secret","port":8080,"username":"proxy-user"}]}',
+            ServiceProxyListResponse::class,
+            200,
+        );
+
+        self::assertCount(1, $response->items);
+        self::assertSame('192.0.2.1', $response->items[0]->ip);
+        self::assertSame('secret', $response->items[0]->password);
+        self::assertSame(8080, $response->items[0]->port);
+        self::assertSame('proxy-user', $response->items[0]->username);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void

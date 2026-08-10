@@ -24,6 +24,7 @@ use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
+use Aceproxies\ResellerApi\Response\Service\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use InvalidArgumentException;
@@ -721,6 +722,55 @@ final class ServicesTest extends TestCase
             'service-1',
             new CreateProlongationRequest('duration-1', 1),
         );
+    }
+
+    public function testGetsServiceProxyList(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/proxy-list',
+                ProxyListResponse::class,
+            )
+            ->willReturn(new ProxyListResponse([
+                [
+                    'ip' => '192.0.2.1',
+                    'password' => 'secret',
+                    'port' => 8080,
+                    'username' => 'proxy-user',
+                ],
+            ]));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->getProxyList('service/1');
+
+        self::assertSame('192.0.2.1', $result->items[0]->ip);
+        self::assertSame('secret', $result->items[0]->password);
+        self::assertSame(8080, $result->items[0]->port);
+        self::assertSame('proxy-user', $result->items[0]->username);
+    }
+
+    public function testGetProxyListRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->getProxyList('');
+    }
+
+    public function testGetProxyListPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->getProxyList('service-1');
     }
 
     public function testServiceCodeMustNotBeEmpty(): void
