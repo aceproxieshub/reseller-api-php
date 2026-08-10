@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\CreateIpReplacementRequest;
 use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
@@ -15,6 +16,10 @@ use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementCountResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
@@ -426,6 +431,192 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject($exception);
 
         (new Services($httpClient, 'https://example.test'))->deleteWhitelistedIp('service-1', '192.0.2.10');
+    }
+
+    public function testGetsServiceIpReplacements(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/ip-replacements',
+                IpReplacementsResponse::class,
+            )
+            ->willReturn(new IpReplacementsResponse([
+                [
+                    'createdAt' => '2026-08-08T12:00:00+00:00',
+                    'replacedAt' => null,
+                    'status' => 'pending',
+                    'uuid' => 'replacement-1',
+                ],
+            ]));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->getIpReplacements('service/1');
+
+        self::assertSame('replacement-1', $result->items[0]->uuid);
+        self::assertSame('pending', $result->items[0]->status);
+        self::assertSame('+00:00', $result->items[0]->createdAt->getTimezone()->getName());
+        self::assertNull($result->items[0]->replacedAt);
+    }
+
+    public function testGetIpReplacementsRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->getIpReplacements('');
+    }
+
+    public function testGetIpReplacementsPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->getIpReplacements('service-1');
+    }
+
+    public function testCreatesServiceIpReplacementWithoutLocations(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_POST,
+                'https://example.test/api/v1/services/service%2F1/ip-replacements',
+                IpReplacementResponse::class,
+                ['json' => []],
+            )
+            ->willReturn(new IpReplacementResponse(
+                createdAt: '2026-08-08T12:00:00+00:00',
+                replacedAt: null,
+                status: 'pending',
+                uuid: 'replacement-1',
+            ));
+
+        $result = (new Services($httpClient, 'https://example.test/'))->createIpReplacement(
+            'service/1',
+            new CreateIpReplacementRequest(),
+        );
+
+        self::assertSame('replacement-1', $result->uuid);
+    }
+
+    public function testCreatesServiceIpReplacementWithLocations(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_POST,
+                'https://example.test/api/v1/services/service%2F1/ip-replacements',
+                IpReplacementResponse::class,
+                ['json' => ['locations' => ['US', 'DE']]],
+            )
+            ->willReturn(new IpReplacementResponse(
+                createdAt: '2026-08-08T12:00:00+00:00',
+                replacedAt: '2026-08-08T12:05:00+00:00',
+                status: 'completed',
+                uuid: 'replacement-1',
+            ));
+
+        $result = (new Services($httpClient, 'https://example.test/'))->createIpReplacement(
+            'service/1',
+            new CreateIpReplacementRequest(['US', 'DE']),
+        );
+
+        self::assertSame('completed', $result->status);
+        self::assertNotNull($result->replacedAt);
+    }
+
+    public function testCreateIpReplacementRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->createIpReplacement('', new CreateIpReplacementRequest());
+    }
+
+    public function testCreateIpReplacementPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->createIpReplacement(
+            'service-1',
+            new CreateIpReplacementRequest(),
+        );
+    }
+
+    public function testGetsAvailableIpReplacements(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/ip-replacements/available',
+                IpReplacementCountResponse::class,
+            )
+            ->willReturn(new IpReplacementCountResponse(7));
+
+        self::assertSame(7, (new Services($httpClient, 'https://example.test'))->getAvailableIpReplacements('service/1')->count);
+    }
+
+    public function testGetsIpReplacementCount(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/ip-replacements/count',
+                IpReplacementCountResponse::class,
+            )
+            ->willReturn(new IpReplacementCountResponse(12));
+
+        self::assertSame(12, (new Services($httpClient, 'https://example.test'))->getIpReplacementCount('service/1')->count);
+    }
+
+    public function testGetsIpReplacementLocations(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/ip-replacements/locations',
+                IpReplacementLocationsResponse::class,
+            )
+            ->willReturn(new IpReplacementLocationsResponse([
+                ['country' => 'United States', 'id' => 'us', 'location' => 'New York'],
+            ]));
+
+        $result = (new Services($httpClient, 'https://example.test'))->getIpReplacementLocations('service/1');
+
+        self::assertSame('us', $result->locations[0]->id);
+        self::assertSame('United States', $result->locations[0]->country);
+        self::assertSame('New York', $result->locations[0]->location);
+    }
+
+    public function testIpReplacementCountAndLocationsRequireAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+        $services->getAvailableIpReplacements('');
     }
 
     public function testServiceCodeMustNotBeEmpty(): void

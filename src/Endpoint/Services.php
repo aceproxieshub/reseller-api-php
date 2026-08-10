@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\CreateIpReplacementRequest;
 use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
@@ -15,6 +16,10 @@ use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementCountResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
@@ -214,6 +219,80 @@ final readonly class Services implements ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
+    public function getIpReplacements(string $serviceCode): IpReplacementsResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements',
+            IpReplacementsResponse::class,
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function createIpReplacement(string $serviceCode, CreateIpReplacementRequest $request): IpReplacementResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_POST,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements',
+            IpReplacementResponse::class,
+            ['json' => $request->toArray()],
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getAvailableIpReplacements(string $serviceCode): IpReplacementCountResponse
+    {
+        return $this->getIpReplacementCountAtPath($serviceCode, 'available');
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getIpReplacementCount(string $serviceCode): IpReplacementCountResponse
+    {
+        return $this->getIpReplacementCountAtPath($serviceCode, 'count');
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getIpReplacementLocations(string $serviceCode): IpReplacementLocationsResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements/locations',
+            IpReplacementLocationsResponse::class,
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
     public function update(string $code, UpdateServiceRequest $request): void
     {
         Assert::nonEmptyString($code, 'service code');
@@ -229,5 +308,22 @@ final readonly class Services implements ServicesInterface
     public function residential(): ResidentialInterface
     {
         return new Residential($this->httpClient, $this->baseUrl);
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    private function getIpReplacementCountAtPath(string $serviceCode, string $path): IpReplacementCountResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements/' . $path,
+            IpReplacementCountResponse::class,
+        );
     }
 }
