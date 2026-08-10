@@ -15,6 +15,9 @@ use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementCountResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
+use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyListResponse;
@@ -317,6 +320,43 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame('Office', $response->items[0]->description);
         self::assertSame('198.51.100.20', $response->items[1]->ip);
         self::assertNull($response->items[1]->description);
+    }
+
+    public function testCreatesServiceIpReplacements(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"createdAt":"2026-08-08T12:00:00+00:00","replacedAt":null,"status":"pending","uuid":"replacement-1"}]}',
+            IpReplacementsResponse::class,
+            200,
+        );
+
+        self::assertSame('replacement-1', $response->items[0]->uuid);
+        self::assertSame('+00:00', $response->items[0]->createdAt->getTimezone()->getName());
+        self::assertNull($response->items[0]->replacedAt);
+    }
+
+    public function testCreatesServiceIpReplacementCount(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"count":7}}',
+            IpReplacementCountResponse::class,
+            200,
+        );
+
+        self::assertSame(7, $response->count);
+    }
+
+    public function testCreatesServiceIpReplacementLocations(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"locations":[{"country":"United States","id":"us","location":"New York"}]}}',
+            IpReplacementLocationsResponse::class,
+            200,
+        );
+
+        self::assertSame('us', $response->locations[0]->id);
+        self::assertSame('United States', $response->locations[0]->country);
+        self::assertSame('New York', $response->locations[0]->location);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void
