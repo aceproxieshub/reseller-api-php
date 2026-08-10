@@ -9,6 +9,7 @@ use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
+use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use InvalidArgumentException;
@@ -38,6 +39,14 @@ interface ServicesInterface
      * @throws InvalidArgumentException
      */
     public function getBandwidth(string $serviceCode): ?BandwidthResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getCredentials(string $serviceCode): ?CredentialsResponse;
 
     /**
      * @throws ApiException

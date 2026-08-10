@@ -13,6 +13,7 @@ use Aceproxies\ResellerApi\Response\Product\ProductResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
+use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
@@ -289,6 +290,18 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame(100, $response->bandwidth->total);
         self::assertSame('GB', $response->bandwidth->unit);
         self::assertSame(87.5, $response->bandwidth->used);
+    }
+
+    public function testCreatesServiceCredentials(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"password":"secret","username":"proxy-user"}}',
+            CredentialsResponse::class,
+            200,
+        );
+
+        self::assertSame('proxy-user', $response->username);
+        self::assertSame('secret', $response->password);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void
