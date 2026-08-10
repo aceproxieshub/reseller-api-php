@@ -22,6 +22,7 @@ use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
+use Aceproxies\ResellerApi\Response\Service\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use InvalidArgumentException;
@@ -147,6 +148,14 @@ interface ServicesInterface
      * @throws InvalidArgumentException
      */
     public function createProlongation(string $serviceCode, CreateProlongationRequest $request): CreateProlongationResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getProxyList(string $serviceCode): ProxyListResponse;
 
     /**
      * @throws ApiException

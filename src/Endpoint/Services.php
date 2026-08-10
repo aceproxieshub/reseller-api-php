@@ -24,6 +24,7 @@ use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
+use Aceproxies\ResellerApi\Response\Service\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
@@ -322,6 +323,23 @@ final readonly class Services implements ServicesInterface
             rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/prolongations',
             CreateProlongationResponse::class,
             ['json' => $request->toArray()],
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getProxyList(string $serviceCode): ProxyListResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/proxy-list',
+            ProxyListResponse::class,
         );
     }
 
