@@ -112,4 +112,22 @@ final readonly class Residential implements ResidentialInterface
             ['json' => $request->toArray()],
         );
     }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function deleteProxyRequest(string $code, string $id): ProxyRequestResponse
+    {
+        Assert::nonEmptyString($code, 'service code');
+        Assert::nonEmptyString($id, 'proxy request ID');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_DELETE,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests/' . rawurlencode($id),
+            ProxyRequestResponse::class,
+        );
+    }
 }

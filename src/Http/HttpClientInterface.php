@@ -25,6 +25,7 @@ interface HttpClientInterface
     public const string METHOD_GET = 'GET';
     public const string METHOD_POST = 'POST';
     public const string METHOD_PATCH = 'PATCH';
+    public const string METHOD_DELETE = 'DELETE';
 
     public const string HEADER_ACCEPT = 'Accept';
     public const string HEADER_ACCEPT_JSON = 'application/json';

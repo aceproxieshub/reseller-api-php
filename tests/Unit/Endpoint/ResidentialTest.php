@@ -277,4 +277,61 @@ final class ResidentialTest extends TestCase
             new CreateProxyRequest(1, 10, 'all'),
         );
     }
+
+    public function testDeletesResidentialProxyRequest(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_DELETE,
+                'https://example.test/api/v1/services/residential/service%2F1/proxy-requests/request%2F1',
+                ProxyRequestResponse::class,
+            )
+            ->willReturn(new ProxyRequestResponse(
+                countryId: 1,
+                createdAt: '2026-08-08T12:00:00+00:00',
+                id: 'request/1',
+                proxyCount: 10,
+                rotationInterval: 'all',
+                status: 'deleted',
+                updatedAt: '2026-08-08T12:30:00+00:00',
+            ));
+
+        $response = (new Residential($httpClient, 'https://example.test///'))->deleteProxyRequest('service/1', 'request/1');
+
+        self::assertSame('request/1', $response->id);
+        self::assertSame('deleted', $response->status);
+    }
+
+    public function testDeleteProxyRequestRequiresAServiceCode(): void
+    {
+        $residential = new Residential($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $residential->deleteProxyRequest('', 'request-1');
+    }
+
+    public function testDeleteProxyRequestRequiresAProxyRequestId(): void
+    {
+        $residential = new Residential($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The proxy request ID must not be empty.'));
+
+        $residential->deleteProxyRequest('service-1', '');
+    }
+
+    public function testDeleteProxyRequestPropagatesNotFoundApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Residential($httpClient, 'https://example.test'))->deleteProxyRequest('service-1', 'request-1');
+    }
 }

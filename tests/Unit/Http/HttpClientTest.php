@@ -64,6 +64,30 @@ final class HttpClientTest extends TestCase
         self::assertInstanceOf(EmptyResponse::class, $result);
     }
 
+    public function testDeleteMethodIsPassedToTransport(): void
+    {
+        $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
+        $this->client()
+            ->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_DELETE,
+                'https://example.test/resource/1',
+                self::callback(static fn (array $options): bool => $options['headers'] === [
+                    HttpClientInterface::HEADER_ACCEPT => HttpClientInterface::HEADER_ACCEPT_JSON,
+                ]),
+            )
+            ->willReturn($response);
+
+        $result = $this->httpClient->request(
+            method: HttpClientInterface::METHOD_DELETE,
+            url: 'https://example.test/resource/1',
+            responseClass: HealthResponse::class,
+        );
+
+        self::assertSame('ok', $result->status);
+    }
+
     public function testAuthenticatedRequestAddsBearerAuthorizationHeader(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');

@@ -53,4 +53,12 @@ interface ResidentialInterface
      * @throws InvalidArgumentException
      */
     public function createProxyRequest(string $code, CreateProxyRequest $request): ProxyRequestResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function deleteProxyRequest(string $code, string $id): ProxyRequestResponse;
 }
