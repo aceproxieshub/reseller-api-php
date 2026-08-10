@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service updates through `Client::services()->update()`
 - Service bandwidth lookup through `Client::services()->getBandwidth()`
 - Service auth credentials lookup through `Client::services()->getCredentials()`
+- Service auth credentials updates through `Client::services()->updateCredentials()`
 - Residential service countries through `Client::services()->residential()->countries()`
 - Residential rotation intervals through `Client::services()->residential()->rotationIntervals()`
 - Residential proxy request listing through `Client::services()->residential()->proxyRequests()`
