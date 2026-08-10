@@ -9,15 +9,9 @@ use Aceproxies\ResellerApi\Response\AssociativeDataResponseInterface;
 final readonly class RotationIntervalsResponse implements AssociativeDataResponseInterface
 {
     /**
-     * @var array<string, string>
+     * @param array<string, string> $intervals
      */
-    public array $intervals;
-
-    /**
-     * @param array<string, string> $data
-     */
-    public function __construct(array $data)
+    public function __construct(public array $intervals)
     {
-        $this->intervals = $data;
     }
 }

@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
@@ -131,6 +132,24 @@ final readonly class Services implements ServicesInterface
 
             throw $exception;
         }
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function updateCredentials(string $serviceCode, UpdateCredentialsRequest $request): CredentialsResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_PUT,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/credentials',
+            CredentialsResponse::class,
+            ['json' => $request->toArray()],
+        );
     }
 
     /**

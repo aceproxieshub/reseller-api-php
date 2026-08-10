@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
@@ -221,6 +222,72 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
         $services->getCredentials('');
+    }
+
+    public function testUpdatesServiceCredentialsWithPasswordOnly(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_PUT,
+                'https://example.test/api/v1/services/service%2F1/auth/credentials',
+                CredentialsResponse::class,
+                ['json' => ['password' => 'secret']],
+            )
+            ->willReturn(new CredentialsResponse('proxy-user', 'secret'));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->updateCredentials(
+            'service/1',
+            new UpdateCredentialsRequest('secret'),
+        );
+
+        self::assertSame('proxy-user', $result->username);
+        self::assertSame('secret', $result->password);
+    }
+
+    public function testUpdatesServiceCredentialsWithUsernameAndPassword(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_PUT,
+                'https://example.test/api/v1/services/service%2F1/auth/credentials',
+                CredentialsResponse::class,
+                ['json' => ['password' => 'secret', 'username' => 'proxy-user']],
+            )
+            ->willReturn(new CredentialsResponse('proxy-user', 'secret'));
+
+        (new Services($httpClient, 'https://example.test/'))->updateCredentials(
+            'service/1',
+            new UpdateCredentialsRequest('secret', 'proxy-user'),
+        );
+    }
+
+    public function testUpdateCredentialsPropagatesApiException(): void
+    {
+        $exception = new ApiException(400, 'Bad request', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test/'))->updateCredentials(
+            'service-1',
+            new UpdateCredentialsRequest('secret'),
+        );
+    }
+
+    public function testUpdateCredentialsServiceCodeMustNotBeEmpty(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->updateCredentials('', new UpdateCredentialsRequest('secret'));
     }
 
     public function testServiceCodeMustNotBeEmpty(): void

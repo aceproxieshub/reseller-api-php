@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Endpoint;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
+use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
@@ -47,6 +48,14 @@ interface ServicesInterface
      * @throws InvalidArgumentException
      */
     public function getCredentials(string $serviceCode): ?CredentialsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function updateCredentials(string $serviceCode, UpdateCredentialsRequest $request): CredentialsResponse;
 
     /**
      * @throws ApiException
