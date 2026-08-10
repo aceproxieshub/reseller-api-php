@@ -7,12 +7,15 @@ namespace Aceproxies\ResellerApi\Endpoint;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
+use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use InvalidArgumentException;
 
 interface ServicesInterface
@@ -56,6 +59,30 @@ interface ServicesInterface
      * @throws InvalidArgumentException
      */
     public function updateCredentials(string $serviceCode, UpdateCredentialsRequest $request): CredentialsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getWhitelistedIps(string $serviceCode): WhitelistedIpsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function addWhitelistedIp(string $serviceCode, CreateWhitelistedIpRequest $request): WhitelistedIpResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function deleteWhitelistedIp(string $serviceCode, string $ip): void;
 
     /**
      * @throws ApiException

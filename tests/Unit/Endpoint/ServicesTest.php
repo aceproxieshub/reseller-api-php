@@ -7,6 +7,7 @@ namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
@@ -15,6 +16,8 @@ use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -288,6 +291,141 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
         $services->updateCredentials('', new UpdateCredentialsRequest('secret'));
+    }
+
+    public function testGetsServiceWhitelistedIps(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/auth/whitelisted-ips',
+                WhitelistedIpsResponse::class,
+            )
+            ->willReturn(new WhitelistedIpsResponse([
+                ['ip' => '192.0.2.10', 'description' => 'Office'],
+            ]));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->getWhitelistedIps('service/1');
+
+        self::assertSame('192.0.2.10', $result->items[0]->ip);
+        self::assertSame('Office', $result->items[0]->description);
+    }
+
+    public function testGetWhitelistedIpsRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->getWhitelistedIps('');
+    }
+
+    public function testGetWhitelistedIpsPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->getWhitelistedIps('service-1');
+    }
+
+    public function testAddsServiceWhitelistedIp(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_POST,
+                'https://example.test/api/v1/services/service%2F1/auth/whitelisted-ips',
+                WhitelistedIpResponse::class,
+                ['json' => ['ip' => '192.0.2.10']],
+            )
+            ->willReturn(new WhitelistedIpResponse('192.0.2.10', 'Office'));
+
+        $result = (new Services($httpClient, 'https://example.test/'))->addWhitelistedIp(
+            'service/1',
+            new CreateWhitelistedIpRequest('192.0.2.10'),
+        );
+
+        self::assertSame('192.0.2.10', $result->ip);
+        self::assertSame('Office', $result->description);
+    }
+
+    public function testAddWhitelistedIpRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->addWhitelistedIp('', new CreateWhitelistedIpRequest('192.0.2.10'));
+    }
+
+    public function testAddWhitelistedIpPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->addWhitelistedIp(
+            'service-1',
+            new CreateWhitelistedIpRequest('192.0.2.10'),
+        );
+    }
+
+    public function testDeletesServiceWhitelistedIp(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_DELETE,
+                'https://example.test/api/v1/services/service%2F1/auth/whitelisted-ips/192.0.2.10',
+                EmptyResponse::class,
+            )
+            ->willReturn(new EmptyResponse());
+
+        (new Services($httpClient, 'https://example.test///'))->deleteWhitelistedIp('service/1', '192.0.2.10');
+    }
+
+    public function testDeleteWhitelistedIpRequiresServiceCodeAndIp(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->deleteWhitelistedIp('', '192.0.2.10');
+    }
+
+    public function testDeleteWhitelistedIpRequiresAnIp(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The IP address must not be empty.'));
+
+        $services->deleteWhitelistedIp('service-1', '');
+    }
+
+    public function testDeleteWhitelistedIpPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->deleteWhitelistedIp('service-1', '192.0.2.10');
     }
 
     public function testServiceCodeMustNotBeEmpty(): void
