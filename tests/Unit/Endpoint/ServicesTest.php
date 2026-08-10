@@ -8,12 +8,14 @@ use Aceproxies\ResellerApi\Endpoint\Services;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\CreateIpReplacementRequest;
+use Aceproxies\ResellerApi\Request\Service\CreateProlongationRequest;
 use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
+use Aceproxies\ResellerApi\Response\Service\CreateProlongationResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementCountResponse;
@@ -21,6 +23,7 @@ use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
+use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use InvalidArgumentException;
@@ -617,6 +620,107 @@ final class ServicesTest extends TestCase
 
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
         $services->getAvailableIpReplacements('');
+    }
+
+    public function testGetsServiceProlongations(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/prolongations',
+                ProlongationsResponse::class,
+            )
+            ->willReturn(new ProlongationsResponse([
+                [
+                    'durationDays' => 30,
+                    'durationId' => 'duration-1',
+                    'name' => 'Monthly',
+                    'price' => 18.59,
+                ],
+            ]));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->getProlongations('service/1');
+
+        self::assertSame('duration-1', $result->items[0]->durationId);
+        self::assertSame(30, $result->items[0]->durationDays);
+        self::assertSame(18.59, $result->items[0]->price);
+    }
+
+    public function testGetProlongationsRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->getProlongations('');
+    }
+
+    public function testGetProlongationsPropagatesApiException(): void
+    {
+        $exception = new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->getProlongations('service-1');
+    }
+
+    public function testCreatesServiceProlongation(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_POST,
+                'https://example.test/api/v1/services/service%2F1/prolongations',
+                CreateProlongationResponse::class,
+                ['json' => ['durationId' => 'duration-1', 'quantity' => 2]],
+            )
+            ->willReturn(new CreateProlongationResponse(
+                durationId: 'duration-1',
+                newExpirationDate: '2026-09-08T12:00:00+00:00',
+                quantity: 2,
+                status: 'completed',
+            ));
+
+        $result = (new Services($httpClient, 'https://example.test/'))->createProlongation(
+            'service/1',
+            new CreateProlongationRequest('duration-1', 2),
+        );
+
+        self::assertSame('duration-1', $result->durationId);
+        self::assertSame('2026-09-08', $result->newExpirationDate->format('Y-m-d'));
+        self::assertSame('completed', $result->status);
+    }
+
+    public function testCreateProlongationRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->createProlongation('', new CreateProlongationRequest('duration-1', 1));
+    }
+
+    public function testCreateProlongationPropagatesApiException(): void
+    {
+        $exception = new ApiException(403, 'Forbidden', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test'))->createProlongation(
+            'service-1',
+            new CreateProlongationRequest('duration-1', 1),
+        );
     }
 
     public function testServiceCodeMustNotBeEmpty(): void
