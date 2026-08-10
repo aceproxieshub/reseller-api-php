@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Service auth credentials updates through `Client::services()->updateCredentials()`
 - Service auth whitelisted IP management through `Client::services()->getWhitelistedIps()`, `addWhitelistedIp()`, and `deleteWhitelistedIp()`
 - Service IP replacement listing, creation, quota, count, and location endpoints
+- Service prolongation listing and creation through `Client::services()->getProlongations()` and `createProlongation()`
 - Residential service countries through `Client::services()->residential()->countries()`
 - Residential rotation intervals through `Client::services()->residential()->rotationIntervals()`
 - Residential proxy request listing through `Client::services()->residential()->proxyRequests()`

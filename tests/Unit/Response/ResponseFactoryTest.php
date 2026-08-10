@@ -13,12 +13,14 @@ use Aceproxies\ResellerApi\Response\Product\ProductResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
+use Aceproxies\ResellerApi\Response\Service\CreateProlongationResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementCountResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
+use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\CountriesResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
@@ -357,6 +359,33 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame('us', $response->locations[0]->id);
         self::assertSame('United States', $response->locations[0]->country);
         self::assertSame('New York', $response->locations[0]->location);
+    }
+
+    public function testCreatesServiceProlongations(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"durationDays":30,"durationId":"duration-1","name":"Monthly","price":18.59}]}',
+            ProlongationsResponse::class,
+            200,
+        );
+
+        self::assertSame('duration-1', $response->items[0]->durationId);
+        self::assertSame('Monthly', $response->items[0]->name);
+        self::assertSame(18.59, $response->items[0]->price);
+    }
+
+    public function testCreatesServiceProlongation(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"durationId":"duration-1","newExpirationDate":"2026-09-08T12:00:00+00:00","quantity":2,"status":"completed"}}',
+            CreateProlongationResponse::class,
+            200,
+        );
+
+        self::assertSame('duration-1', $response->durationId);
+        self::assertSame('2026-09-08', $response->newExpirationDate->format('Y-m-d'));
+        self::assertSame(2, $response->quantity);
+        self::assertSame('completed', $response->status);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void

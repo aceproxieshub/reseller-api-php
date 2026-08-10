@@ -8,10 +8,12 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Request\Service\CreateIpReplacementRequest;
+use Aceproxies\ResellerApi\Request\Service\CreateProlongationRequest;
 use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
+use Aceproxies\ResellerApi\Response\Service\CreateProlongationResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementCountResponse;
@@ -19,6 +21,7 @@ use Aceproxies\ResellerApi\Response\Service\IpReplacementLocationsResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementResponse;
 use Aceproxies\ResellerApi\Response\Service\IpReplacementsResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
+use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
 use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use InvalidArgumentException;
@@ -128,6 +131,22 @@ interface ServicesInterface
      * @throws InvalidArgumentException
      */
     public function getIpReplacementLocations(string $serviceCode): IpReplacementLocationsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getProlongations(string $serviceCode): ProlongationsResponse;
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function createProlongation(string $serviceCode, CreateProlongationRequest $request): CreateProlongationResponse;
 
     /**
      * @throws ApiException
