@@ -8,6 +8,7 @@ use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
+use Aceproxies\ResellerApi\Request\Service\CreateWhitelistedIpRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateCredentialsRequest;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
@@ -15,6 +16,8 @@ use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
 use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use Aceproxies\ResellerApi\Validation\Assert;
 use InvalidArgumentException;
 
@@ -149,6 +152,59 @@ final readonly class Services implements ServicesInterface
             rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/credentials',
             CredentialsResponse::class,
             ['json' => $request->toArray()],
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function getWhitelistedIps(string $serviceCode): WhitelistedIpsResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_GET,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/whitelisted-ips',
+            WhitelistedIpsResponse::class,
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function addWhitelistedIp(string $serviceCode, CreateWhitelistedIpRequest $request): WhitelistedIpResponse
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+
+        return $this->httpClient->request(
+            HttpClientInterface::METHOD_POST,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/whitelisted-ips',
+            WhitelistedIpResponse::class,
+            ['json' => $request->toArray()],
+        );
+    }
+
+    /**
+     * @throws ApiException
+     * @throws InvalidResponseException
+     * @throws TransportException
+     * @throws InvalidArgumentException
+     */
+    public function deleteWhitelistedIp(string $serviceCode, string $ip): void
+    {
+        Assert::nonEmptyString($serviceCode, 'service code');
+        Assert::nonEmptyString($ip, 'IP address');
+
+        $this->httpClient->request(
+            HttpClientInterface::METHOD_DELETE,
+            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/whitelisted-ips/' . rawurlencode($ip),
+            EmptyResponse::class,
         );
     }
 

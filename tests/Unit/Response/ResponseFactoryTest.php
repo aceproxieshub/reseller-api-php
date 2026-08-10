@@ -21,6 +21,7 @@ use Aceproxies\ResellerApi\Response\Service\Residential\ProxyListResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestsResponse;
 use Aceproxies\ResellerApi\Response\Service\Residential\RotationIntervalsResponse;
 use Aceproxies\ResellerApi\Response\Service\ServiceResponse;
+use Aceproxies\ResellerApi\Response\Service\WhitelistedIpsResponse;
 use JsonException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -302,6 +303,20 @@ final class ResponseFactoryTest extends TestCase
 
         self::assertSame('proxy-user', $response->username);
         self::assertSame('secret', $response->password);
+    }
+
+    public function testCreatesServiceWhitelistedIps(): void
+    {
+        $response = $this->factory->create(
+            '{"data":[{"description":"Office","ip":"192.0.2.10"},{"ip":"198.51.100.20"}]}',
+            WhitelistedIpsResponse::class,
+            200,
+        );
+
+        self::assertSame('192.0.2.10', $response->items[0]->ip);
+        self::assertSame('Office', $response->items[0]->description);
+        self::assertSame('198.51.100.20', $response->items[1]->ip);
+        self::assertNull($response->items[1]->description);
     }
 
     public function testMissingProductFieldThrowsInvalidResponseException(): void
