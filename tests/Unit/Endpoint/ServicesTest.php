@@ -11,6 +11,7 @@ use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\Service\BandwidthResponse;
+use Aceproxies\ResellerApi\Response\Service\CredentialsResponse;
 use Aceproxies\ResellerApi\Response\Service\DetailResponse;
 use Aceproxies\ResellerApi\Response\Service\ListResponse;
 use InvalidArgumentException;
@@ -169,6 +170,57 @@ final class ServicesTest extends TestCase
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
         $services->getBandwidth('');
+    }
+
+    public function testGetsServiceCredentials(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services/service%2F1/auth/credentials',
+                CredentialsResponse::class,
+            )
+            ->willReturn(new CredentialsResponse('proxy-user', 'secret'));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->getCredentials('service/1');
+
+        self::assertNotNull($result);
+        self::assertSame('proxy-user', $result->username);
+        self::assertSame('secret', $result->password);
+    }
+
+    public function testGetCredentialsReturnsNullWhenServiceIsNotFound(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException(new ApiException(HttpClientInterface::HTTP_NOT_FOUND, 'Not found', '{}'));
+
+        self::assertNull((new Services($httpClient, 'https://example.test/'))->getCredentials('service-1'));
+    }
+
+    public function testGetCredentialsPropagatesNonNotFoundApiException(): void
+    {
+        $exception = new ApiException(409, 'Conflict', '{}');
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        (new Services($httpClient, 'https://example.test/'))->getCredentials('service-1');
+    }
+
+    public function testGetCredentialsRequiresAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+
+        $services->getCredentials('');
     }
 
     public function testServiceCodeMustNotBeEmpty(): void
