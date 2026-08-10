@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Services list endpoint support
 - Service detail lookup through `Client::services()->find()`
 - Service updates through `Client::services()->update()`
+- Service bandwidth lookup through `Client::services()->getBandwidth()`
 - Residential service countries through `Client::services()->residential()->countries()`
 - Residential rotation intervals through `Client::services()->residential()->rotationIntervals()`
 - Residential proxy request listing through `Client::services()->residential()->proxyRequests()`
