@@ -1,0 +1,53 @@
+name: PHP Compatibility
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: php-compatibility-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  production-compatibility:
+    name: PHP ${{ matrix.php-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '8.3'
+          - '8.4'
+          - '8.5'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: curl, dom, mbstring, xml
+          coverage: none
+          cache: composer
+          tools: composer:v2
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
+
+      - name: Check production platform requirements
+        run: composer check-platform-reqs --no-dev
+
+      - name: Generate optimized production autoloader
+        run: composer dump-autoload --no-dev --classmap-authoritative
+
+      - name: Lint production source
+        run: find src -type f -name '*.php' -print0 | xargs -0 -n1 php -l

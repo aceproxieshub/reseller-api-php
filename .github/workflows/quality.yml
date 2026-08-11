@@ -1,0 +1,48 @@
+name: Quality
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: curl, dom, mbstring, xml
+          coverage: none
+          cache: composer
+          tools: composer:v2
+
+      - name: Build
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHP_CodeSniffer
+        run: vendor/bin/phpcs
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+
+      - name: Run Rector (dry run)
+        run: vendor/bin/rector process --dry-run
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
