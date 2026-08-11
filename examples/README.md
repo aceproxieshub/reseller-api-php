@@ -6,7 +6,7 @@ Install the Composer dependencies and expose your API token as an environment va
 
 ```bash
 composer install
-export ACEPROXIES_API_TOKEN='your-api-token'
+export ACEPROXIES_RESELLER_API_TOKEN='your-api-token'
 php examples/health.php
 ```
 
