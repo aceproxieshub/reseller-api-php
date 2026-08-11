@@ -39,6 +39,10 @@ echo $health->status;
 ```
 
 
+## Examples
+
+Runnable examples for every public API operation are available in the [examples guide](./examples/README.md)
+
 [composer]: https://getcomposer.org/
 [curl]: http://curl.haxx.se/docs/caextract.html
 [php-cs-fixer]: https://github.com/FriendsOfPHP/PHP-CS-Fixer
