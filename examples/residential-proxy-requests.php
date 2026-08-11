@@ -10,12 +10,12 @@ $client = require __DIR__ . '/_bootstrap.php';
 $serviceCode = 'your-residential-service-code';
 $proxyRequestId = 'your-proxy-request-id';
 
-// List all proxy requests for the service.
+// List all proxy requests for the service
 $proxyRequests = $client->services()->residential()->proxyRequests($serviceCode);
 
 var_dump($proxyRequests);
 
-// Find one proxy request.
+// Find one proxy request
 $proxyRequest = $client->services()->residential()->findProxyRequest($serviceCode, $proxyRequestId);
 
 var_dump($proxyRequest);
@@ -25,7 +25,8 @@ $proxies = $client->services()->residential()->getProxyList($serviceCode, $proxy
 
 var_dump($proxies);
 
-// Creating or deleting a proxy request changes the service. Review the values before uncommenting.
+// Creating or deleting a proxy request changes the service. Review the values before uncommenting
+
 /*
 $request = new \Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest(
     countryId: 1,
