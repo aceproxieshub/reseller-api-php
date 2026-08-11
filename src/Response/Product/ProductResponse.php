@@ -28,9 +28,9 @@ final readonly class ProductResponse
             ? null
             : array_map(
                 static fn (array $duration): ProductDurationResponse => new ProductDurationResponse(
-                    durationDays: $duration['durationDays'],
                     id: $duration['id'],
                     name: $duration['name'],
+                    durationDays: $duration['durationDays'],
                     price: $duration['price'],
                 ),
                 $durations,

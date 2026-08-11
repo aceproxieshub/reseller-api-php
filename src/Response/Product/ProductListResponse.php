@@ -12,7 +12,7 @@ final readonly class ProductListResponse
     public array $items;
 
     /**
-     * @param list<array{id: string, name: string, type: string, price: float|int}>|null, id: string, name: string, options: array<string, mixed>, price: float|int|null, addons: mixed, durations: list<array{durationDays: int}> $data
+     * @param list<array{id: string, name: string, type: string, options: array<string, mixed>, price: float|int|null, addons: mixed, durations: list<array{id: string, name: string, durationDays: int, price: float|int}>|null}> $data
      */
     public function __construct(array $data)
     {

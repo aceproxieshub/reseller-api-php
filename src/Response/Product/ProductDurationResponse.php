@@ -7,9 +7,9 @@ namespace Aceproxies\ResellerApi\Response\Product;
 final readonly class ProductDurationResponse
 {
     public function __construct(
-        public int $durationDays,
         public string $id,
         public string $name,
+        public int $durationDays,
         public float $price,
     ) {
     }
