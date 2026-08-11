@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Tests\Unit\Request;
 
+use Aceproxies\ResellerApi\Enum\Protocol;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload;
 use Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest;
 use InvalidArgumentException;
@@ -13,7 +14,7 @@ final class UpdateServiceRequestTest extends TestCase
 {
     public function testSerializesProtocolAndAuth(): void
     {
-        $request = new UpdateServiceRequest('http', new UpdateServiceAuthPayload('ip'));
+        $request = new UpdateServiceRequest(Protocol::http, new UpdateServiceAuthPayload('ip'));
 
         self::assertSame([
             'protocol' => 'http',
@@ -26,13 +27,6 @@ final class UpdateServiceRequestTest extends TestCase
         self::expectExceptionObject(new InvalidArgumentException('The service update must contain at least one field.'));
 
         new UpdateServiceRequest();
-    }
-
-    public function testRejectsUnsupportedProtocol(): void
-    {
-        self::expectExceptionObject(new InvalidArgumentException('The service protocol must be either socks5 or http.'));
-
-        new UpdateServiceRequest('https');
     }
 
     public function testAuthMethodMustNotBeEmpty(): void

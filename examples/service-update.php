@@ -7,7 +7,7 @@ $client = require __DIR__ . '/_bootstrap.php';
 
 
 $request = new \Aceproxies\ResellerApi\Request\Service\UpdateServiceRequest(
-    protocol: 'http',
+    protocol: \Aceproxies\ResellerApi\Enum\Protocol::http,
     auth: new \Aceproxies\ResellerApi\Request\Service\UpdateServiceAuthPayload('ip'),
 );
 

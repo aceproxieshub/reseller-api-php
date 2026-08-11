@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Services;
+use Aceproxies\ResellerApi\Enum\Protocol;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\CreateIpReplacementRequest;
@@ -800,7 +801,7 @@ final class ServicesTest extends TestCase
 
         (new Services($httpClient, 'https://example.test///'))->update(
             'service/1',
-            new UpdateServiceRequest('http', new UpdateServiceAuthPayload('ip')),
+            new UpdateServiceRequest(Protocol::http, new UpdateServiceAuthPayload('ip')),
         );
     }
 
@@ -816,7 +817,7 @@ final class ServicesTest extends TestCase
 
         (new Services($httpClient, 'https://example.test/'))->update(
             'service-1',
-            new UpdateServiceRequest(protocol: 'http'),
+            new UpdateServiceRequest(protocol: Protocol::http),
         );
     }
 
@@ -826,7 +827,7 @@ final class ServicesTest extends TestCase
 
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
-        $services->update('', new UpdateServiceRequest(protocol: 'http'));
+        $services->update('', new UpdateServiceRequest(protocol: Protocol::http));
     }
 
     private function serviceDetails(): DetailResponse

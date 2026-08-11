@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- String-backed `Protocol` and `RotationInterval` enums for service request inputs
 - API version method Client::getApiVersion()
 - Health endpoint support through Client::health()->getHealth()
 - Balance endpoint support with bearer authorization headers

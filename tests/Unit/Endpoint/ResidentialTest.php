@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Residential;
+use Aceproxies\ResellerApi\Enum\RotationInterval;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest;
@@ -158,13 +159,13 @@ final class ResidentialTest extends TestCase
                 ProxyRequestResponse::class,
             )
             ->willReturn(new ProxyRequestResponse(
-                countryId: 1,
-                createdAt: '2026-08-08T12:00:00+00:00',
                 id: 'request/1',
+                countryId: 1,
                 proxyCount: 10,
                 rotationInterval: 'all',
                 status: 'pending',
                 updatedAt: '2026-08-08T12:30:00+00:00',
+                createdAt: '2026-08-08T12:00:00+00:00',
             ));
 
         $response = (new Residential($httpClient, 'https://example.test///'))->findProxyRequest('service/1', 'request/1');
@@ -236,18 +237,18 @@ final class ResidentialTest extends TestCase
                 ],
             )
             ->willReturn(new ProxyRequestResponse(
-                countryId: 1,
-                createdAt: '2026-08-08T12:00:00+00:00',
                 id: 'request-1',
+                countryId: 1,
                 proxyCount: 10,
                 rotationInterval: 'all',
                 status: 'pending',
                 updatedAt: '2026-08-08T12:00:00+00:00',
+                createdAt: '2026-08-08T12:00:00+00:00',
             ));
 
         $response = (new Residential($httpClient, 'https://example.test///'))->createProxyRequest(
             'service/1',
-            new CreateProxyRequest(1, 10, 'all'),
+            new CreateProxyRequest(1, 10, RotationInterval::all),
         );
 
         self::assertSame('request-1', $response->id);
@@ -260,7 +261,7 @@ final class ResidentialTest extends TestCase
 
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
-        $residential->createProxyRequest('', new CreateProxyRequest(1, 10, 'all'));
+        $residential->createProxyRequest('', new CreateProxyRequest(1, 10, RotationInterval::all));
     }
 
     public function testCreateProxyRequestPropagatesApiException(): void
@@ -275,7 +276,7 @@ final class ResidentialTest extends TestCase
 
         (new Residential($httpClient, 'https://example.test'))->createProxyRequest(
             'service-1',
-            new CreateProxyRequest(1, 10, 'all'),
+            new CreateProxyRequest(1, 10, RotationInterval::all),
         );
     }
 
@@ -290,13 +291,13 @@ final class ResidentialTest extends TestCase
                 ProxyRequestResponse::class,
             )
             ->willReturn(new ProxyRequestResponse(
-                countryId: 1,
-                createdAt: '2026-08-08T12:00:00+00:00',
                 id: 'request/1',
+                countryId: 1,
                 proxyCount: 10,
                 rotationInterval: 'all',
                 status: 'deleted',
                 updatedAt: '2026-08-08T12:30:00+00:00',
+                createdAt: '2026-08-08T12:00:00+00:00',
             ));
 
         $response = (new Residential($httpClient, 'https://example.test///'))->deleteProxyRequest('service/1', 'request/1');

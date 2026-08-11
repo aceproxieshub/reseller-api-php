@@ -13,13 +13,13 @@ final readonly class ProxyRequestResponse
     public DateTimeImmutable $updatedAt;
 
     public function __construct(
-        public int $countryId,
-        string $createdAt,
         public string $id,
+        public int $countryId,
         public int $proxyCount,
         public string $rotationInterval,
         public string $status,
         string $updatedAt,
+        string $createdAt,
     ) {
         $this->createdAt = new DateTimeImmutable($createdAt);
         $this->updatedAt = new DateTimeImmutable($updatedAt);
