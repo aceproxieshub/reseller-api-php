@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Request\Service;
 
+use Aceproxies\ResellerApi\Enum\Protocol;
 use InvalidArgumentException;
 
 final readonly class UpdateServiceRequest
 {
     public function __construct(
-        public ?string $protocol = null,
+        public ?Protocol $protocol = null,
         public ?UpdateServiceAuthPayload $auth = null,
     ) {
         if ($this->protocol === null && $this->auth === null) {
             throw new InvalidArgumentException('The service update must contain at least one field.');
-        }
-
-        if ($this->protocol !== null && !in_array($this->protocol, ['socks5', 'http'], true)) {
-            throw new InvalidArgumentException('The service protocol must be either socks5 or http.');
         }
     }
 
@@ -29,7 +26,7 @@ final readonly class UpdateServiceRequest
         $data = [];
 
         if ($this->protocol !== null) {
-            $data['protocol'] = $this->protocol;
+            $data['protocol'] = $this->protocol->value;
         }
 
         if ($this->auth !== null) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Residential;
+use Aceproxies\ResellerApi\Enum\RotationInterval;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest;
@@ -247,7 +248,7 @@ final class ResidentialTest extends TestCase
 
         $response = (new Residential($httpClient, 'https://example.test///'))->createProxyRequest(
             'service/1',
-            new CreateProxyRequest(1, 10, 'all'),
+            new CreateProxyRequest(1, 10, RotationInterval::all),
         );
 
         self::assertSame('request-1', $response->id);
@@ -260,7 +261,7 @@ final class ResidentialTest extends TestCase
 
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
 
-        $residential->createProxyRequest('', new CreateProxyRequest(1, 10, 'all'));
+        $residential->createProxyRequest('', new CreateProxyRequest(1, 10, RotationInterval::all));
     }
 
     public function testCreateProxyRequestPropagatesApiException(): void
@@ -275,7 +276,7 @@ final class ResidentialTest extends TestCase
 
         (new Residential($httpClient, 'https://example.test'))->createProxyRequest(
             'service-1',
-            new CreateProxyRequest(1, 10, 'all'),
+            new CreateProxyRequest(1, 10, RotationInterval::all),
         );
     }
 

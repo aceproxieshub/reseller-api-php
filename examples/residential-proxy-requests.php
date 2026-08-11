@@ -31,7 +31,7 @@ var_dump($proxies);
 $request = new \Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest(
     countryId: 1,
     proxyCount: 10,
-    rotationInterval: 'all',
+    rotationInterval: \Aceproxies\ResellerApi\Enum\RotationInterval::all,
 );
 
 $proxyRequest = $client->services()->residential()->createProxyRequest($serviceCode, $request);
