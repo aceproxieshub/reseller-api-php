@@ -55,11 +55,11 @@ jobs:
       - name: Check platform requirements
         run: composer check-platform-reqs
 
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+
       - name: Generate optimized production autoloader
         run: composer dump-autoload --no-dev --classmap-authoritative
 
       - name: Lint production source
         run: find src -type f -name '*.php' -print0 | xargs -0 -n1 php -l
-
-      - name: Run PHPUnit
-        run: vendor/bin/phpunit
