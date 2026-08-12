@@ -16,23 +16,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  production-compatibility:
-    name: PHP ${{ matrix.php-version }}
+  compatibility:
+    name: PHP ${{ matrix.php-version }} (${{ matrix.dependencies }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        php-version:
-          - '8.3'
-          - '8.4'
-          - '8.5'
+        include:
+          - php-version: '8.3'
+            dependencies: lowest
+            composer-args: '--prefer-lowest'
+          - php-version: '8.3'
+            dependencies: highest
+            composer-args: ''
+          - php-version: '8.4'
+            dependencies: highest
+            composer-args: ''
+          - php-version: '8.5'
+            dependencies: highest
+            composer-args: ''
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: curl, dom, mbstring, xml
@@ -40,14 +49,17 @@ jobs:
           cache: composer
           tools: composer:v2
 
-      - name: Install production dependencies
-        run: composer install --no-dev --prefer-dist --no-progress --no-interaction
+      - name: Resolve compatible dependencies
+        run: composer update --prefer-dist --no-progress --no-interaction ${{ matrix.composer-args }}
 
-      - name: Check production platform requirements
-        run: composer check-platform-reqs --no-dev
+      - name: Check platform requirements
+        run: composer check-platform-reqs
 
       - name: Generate optimized production autoloader
         run: composer dump-autoload --no-dev --classmap-authoritative
 
       - name: Lint production source
         run: find src -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
