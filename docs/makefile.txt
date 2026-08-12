@@ -9,9 +9,15 @@
 ----------------------------------------------------------------------------------
 rector                        Apply Rector's refactorings to the source code
 rector-dry                    Preview Rector's refactorings without changing files
+phpcs                         Coding-standard violations check
 phpcbf                        Automatically fix coding-standard violations
 phpstan                       Run PHPStan static analysis
 phpunit                       Run the PHPUnit test suite
 phpunit-coverage              Run PHPUnit and generate an HTML coverage report
 infection                     Run Infection mutation testing with PHPUnit
+----------------------------------------------------------------------------------
+composer:validate             Strictly validate Composer package metadata and lock
+composer:audit                Audit locked dependencies and abandoned packages
+----------------------------------------------------------------------------------
+ci:quality                    Run all local code-quality checks
 ----------------------------------------------------------------------------------
