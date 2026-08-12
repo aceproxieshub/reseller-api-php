@@ -45,6 +45,28 @@ final class AssertTest extends TestCase
         Assert::nonEmptyString('', 'property');
     }
 
+    public function testNonEmptyStringRejectsWhitespaceOnlyValue(): void
+    {
+        self::expectExceptionObject(new InvalidArgumentException('The property must not be empty.'));
+
+        Assert::nonEmptyString(" \t\n", 'property');
+    }
+
+    public function testIpAddressAcceptsIpv4AndIpv6(): void
+    {
+        Assert::ipAddress('192.0.2.1', 'IP address');
+        Assert::ipAddress('2001:db8::1', 'IP address');
+
+        self::expectNotToPerformAssertions();
+    }
+
+    public function testIpAddressRejectsInvalidValue(): void
+    {
+        self::expectExceptionObject(new InvalidArgumentException('The IP address must be a valid IP address.'));
+
+        Assert::ipAddress('not-an-ip', 'IP address');
+    }
+
     public function testNonEmptyArrayAcceptsValue(): void
     {
         Assert::nonEmptyArray(['value'], 'items');

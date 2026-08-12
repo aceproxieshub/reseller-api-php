@@ -420,7 +420,7 @@ final class ServicesTest extends TestCase
     {
         $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
 
-        self::expectExceptionObject(new InvalidArgumentException('The IP address must not be empty.'));
+        self::expectExceptionObject(new InvalidArgumentException('The IP address must be a valid IP address.'));
 
         $services->deleteWhitelistedIp('service-1', '');
     }
@@ -577,7 +577,7 @@ final class ServicesTest extends TestCase
             )
             ->willReturn(new IpReplacementCountResponse(7));
 
-        self::assertSame(7, (new Services($httpClient, 'https://example.test'))->getAvailableIpReplacements('service/1')->count);
+        self::assertSame(7, (new Services($httpClient, 'https://example.test///'))->getAvailableIpReplacements('service/1')->count);
     }
 
     public function testGetsIpReplacementCount(): void
@@ -609,7 +609,7 @@ final class ServicesTest extends TestCase
                 ['country' => 'United States', 'id' => 'us', 'location' => 'New York'],
             ]));
 
-        $result = (new Services($httpClient, 'https://example.test'))->getIpReplacementLocations('service/1');
+        $result = (new Services($httpClient, 'https://example.test///'))->getIpReplacementLocations('service/1');
 
         self::assertSame('us', $result->locations[0]->id);
         self::assertSame('United States', $result->locations[0]->country);
@@ -622,6 +622,14 @@ final class ServicesTest extends TestCase
 
         self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
         $services->getAvailableIpReplacements('');
+    }
+
+    public function testIpReplacementLocationsRequireAServiceCode(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service code must not be empty.'));
+        $services->getIpReplacementLocations('');
     }
 
     public function testGetsServiceProlongations(): void
