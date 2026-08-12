@@ -50,7 +50,7 @@ The default client applies a 10-second idle timeout and a 30-second maximum requ
 ## Error
 
 - `InvalidArgumentException` is thrown before transport when a request value is invalid.
-- `Aceproxies\ResellerApi\Exception\ApiException` exposes the HTTP status, optional API message/code, and raw response body.
+- `Aceproxies\ResellerApi\Exception\ApiException` exposes the HTTP status, optional API message, and raw response body.
 - `Aceproxies\ResellerApi\Exception\InvalidResponseException` represents malformed or incompatible success payloads.
 - `Aceproxies\ResellerApi\Exception\TransportException` represents exhausted connection or transport failures and retains the underlying exception.
 
@@ -64,5 +64,4 @@ Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
 [composer]: https://getcomposer.org/
 [curl]: http://curl.haxx.se/docs/caextract.html
 [php-cs-fixer]: https://github.com/FriendsOfPHP/PHP-CS-Fixer
-
 

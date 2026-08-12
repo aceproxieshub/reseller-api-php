@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added whitespace and IP-address validation for public request inputs
 - String-backed `Protocol` and `RotationInterval` enums for service request inputs
 - API version method Client::getApiVersion()
 - Health endpoint support through Client::health()->getHealth()
@@ -48,3 +49,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPstan and configuration
 - PHP_CodeSniffer and coding standard definition
 - Initial PHP library package structure
+- Restricted automatic retries to read-only requests to prevent duplicated state changes
+- Preserved transport failure causes and added bounded request timeouts

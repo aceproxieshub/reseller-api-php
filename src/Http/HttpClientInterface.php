@@ -13,6 +13,7 @@ interface HttpClientInterface
 
     public const int INITIAL_BACKOFF_MICROSECONDS = 100_000;
     public const int MAX_BACKOFF_MICROSECONDS = 1_000_000;
+    public const int MAX_RETRY_AFTER_MICROSECONDS = 30_000_000;
 
     public const int HTTP_TOO_MANY_REQUESTS = 429;
     public const int HTTP_OK = 200;
