@@ -14,6 +14,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final readonly class HttpClient implements HttpClientInterface
 {
+    private const float DEFAULT_IDLE_TIMEOUT_SECONDS = 10.0;
+    private const float DEFAULT_MAX_DURATION_SECONDS = 30.0;
+
     /** @var Closure(int): void */
     private Closure $sleeper;
 
@@ -42,6 +45,11 @@ final readonly class HttpClient implements HttpClientInterface
         string $responseClass,
         array $options = [],
     ): object {
+        $options += [
+            'timeout' => self::DEFAULT_IDLE_TIMEOUT_SECONDS,
+            'max_duration' => self::DEFAULT_MAX_DURATION_SECONDS,
+        ];
+
         $headers = $options['headers'] ?? [];
 
         if (!is_array($headers)) {
@@ -108,7 +116,7 @@ final readonly class HttpClient implements HttpClientInterface
 
     private function waitBeforeRetry(int $attempt, ?ResponseInterface $response = null): void
     {
-        $shift = max(0, min($attempt - 1, HttpClientInterface::MAX_ATTEMPTS - 1));
+        $shift = $attempt - 1;
         $delay = min(
             HttpClientInterface::INITIAL_BACKOFF_MICROSECONDS << $shift,
             HttpClientInterface::MAX_BACKOFF_MICROSECONDS,
@@ -154,12 +162,8 @@ final readonly class HttpClient implements HttpClientInterface
     {
         $decoded = json_decode($body, true);
         $error = is_array($decoded) ? ($decoded['error'] ?? null) : null;
-        $message = null;
+        $message = is_array($error) ? ($error['message'] ?? null) : null;
 
-        if (is_array($error) && isset($error['message']) && is_string($error['message'])) {
-            $message = $error['message'];
-        }
-
-        return new ApiException($statusCode, $message, $body);
+        return new ApiException($statusCode, is_string($message) ? $message : null, $body);
     }
 }

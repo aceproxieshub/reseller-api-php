@@ -10,6 +10,7 @@ use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\Health\HealthResponse;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -37,8 +38,12 @@ final class HttpClientTest extends TestCase
                 HttpClientInterface::METHOD_GET,
                 'https://example.test/health',
                 self::callback(static function (array $options): bool {
-                    return $options['headers'] === [
-                        HttpClientInterface::HEADER_ACCEPT => HttpClientInterface::HEADER_ACCEPT_JSON,
+                    return $options === [
+                        'timeout' => 10.0,
+                        'max_duration' => 30.0,
+                        'headers' => [
+                            HttpClientInterface::HEADER_ACCEPT => HttpClientInterface::HEADER_ACCEPT_JSON,
+                        ],
                     ];
                 }),
             )
@@ -48,6 +53,39 @@ final class HttpClientTest extends TestCase
             method: HttpClientInterface::METHOD_GET,
             url: 'https://example.test/health',
             responseClass: HealthResponse::class,
+        );
+
+        self::assertSame('ok', $result->status);
+    }
+
+    /**
+     * @param array<string, float> $options
+     */
+    #[DataProvider('timeoutOverrideProvider')]
+    public function testCallerCanOverrideDefaultTimeouts(
+        array $options,
+        float $expectedTimeout,
+        float $expectedMaxDuration,
+    ): void {
+        $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
+        $this->client()
+            ->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/health',
+                self::callback(static function (array $requestOptions) use ($expectedTimeout, $expectedMaxDuration): bool {
+                    return $requestOptions['timeout'] === $expectedTimeout
+                        && $requestOptions['max_duration'] === $expectedMaxDuration;
+                }),
+            )
+            ->willReturn($response);
+
+        $result = $this->httpClient->request(
+            method: HttpClientInterface::METHOD_GET,
+            url: 'https://example.test/health',
+            responseClass: HealthResponse::class,
+            options: $options,
         );
 
         self::assertSame('ok', $result->status);
@@ -436,13 +474,13 @@ final class HttpClientTest extends TestCase
     {
         $responses = array_map(
             fn (string $body): ResponseInterface => $this->response(HttpClientInterface::HTTP_UNAUTHORIZED, $body),
-            ['{"error":"invalid"}', '{"error":{"message":123}}'],
+            ['null', '{"error":"invalid"}', '{"error":{}}', '{"error":{"message":123}}'],
         );
-        $this->client()->expects(self::exactly(2))
+        $this->client()->expects(self::exactly(4))
             ->method('request')
             ->willReturnOnConsecutiveCalls(...$responses);
 
-        foreach (['{"error":"invalid"}', '{"error":{"message":123}}'] as $expectedBody) {
+        foreach (['null', '{"error":"invalid"}', '{"error":{}}', '{"error":{"message":123}}'] as $expectedBody) {
             try {
                 $this->httpClient->request(
                     method: HttpClientInterface::METHOD_GET,
@@ -561,6 +599,16 @@ final class HttpClientTest extends TestCase
             self::assertSame($transportException, $exception->getPrevious());
             self::assertSame([], $this->delays);
         }
+    }
+
+    /**
+     * @return iterable<string, array{array<string, float>, float, float}>
+     */
+    public static function timeoutOverrideProvider(): iterable
+    {
+        yield 'idle timeout only' => [['timeout' => 1.5], 1.5, 30.0];
+        yield 'maximum duration only' => [['max_duration' => 5.0], 10.0, 5.0];
+        yield 'both timeouts' => [['timeout' => 1.5, 'max_duration' => 5.0], 1.5, 5.0];
     }
 
     protected function setUp(): void
