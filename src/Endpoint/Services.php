@@ -208,7 +208,7 @@ final readonly class Services implements ServicesInterface
     public function deleteWhitelistedIp(string $serviceCode, string $ip): void
     {
         Assert::nonEmptyString($serviceCode, 'service code');
-        Assert::nonEmptyString($ip, 'IP address');
+        Assert::ipAddress($ip, 'IP address');
 
         $this->httpClient->request(
             HttpClientInterface::METHOD_DELETE,

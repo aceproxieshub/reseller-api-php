@@ -5,9 +5,9 @@ Our mission is to provide you clear contracts through pre-defined set of classes
 
 ## Requirements
 
-PHP 8.3 and later
+PHP 8.3 and later, with the cURL, JSON, and Mbstring extensions.
 
-we're staying in sync with official [PHP Supported Versions](https://www.php.net/supported-versions.php) and scheduling supported versions sunset accordingly to security support.
+We stay in sync with the official [PHP supported versions](https://www.php.net/supported-versions.php) and schedule version sunsets according to security support.
 
 ## Composer
 
@@ -38,11 +38,30 @@ $health = $client->health()->getHealth();
 echo $health->status;
 ```
 
-
 ## Examples
 
 Runnable examples for every public API operation are available in the [examples guide](./examples/README.md)
 
+
+## Retry policy
+
+The default client applies a 10-second idle timeout and a 30-second maximum request duration. Read-only `GET` requests are retried up to three times for rate limits, server errors, and transport failures using bounded exponential backoff. Mutating requests are never retried automatically as they might lead to undesired consequences.
+
+## Error
+
+- `InvalidArgumentException` is thrown before transport when a request value is invalid.
+- `Aceproxies\ResellerApi\Exception\ApiException` exposes the HTTP status, optional API message, and raw response body.
+- `Aceproxies\ResellerApi\Exception\InvalidResponseException` represents malformed or incompatible success payloads.
+- `Aceproxies\ResellerApi\Exception\TransportException` represents exhausted connection or transport failures and retains the underlying exception.
+
+Treat exception bodies and response DTOs containing proxy or service credentials as sensitive data and do not log them indiscriminately.
+
+## Security
+
+Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+
+
 [composer]: https://getcomposer.org/
 [curl]: http://curl.haxx.se/docs/caextract.html
 [php-cs-fixer]: https://github.com/FriendsOfPHP/PHP-CS-Fixer
+

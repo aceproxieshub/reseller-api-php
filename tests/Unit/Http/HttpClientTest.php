@@ -24,6 +24,9 @@ final class HttpClientTest extends TestCase
 
     private HttpClient $httpClient;
 
+    /** @var list<int> */
+    private array $delays = [];
+
     public function testSuccessfulRequestSerializesResponseAndAddsAcceptHeader(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
@@ -238,11 +241,29 @@ final class HttpClientTest extends TestCase
         );
 
         self::assertSame('ok', $result->status);
+        self::assertSame([0], $this->delays);
+    }
+
+    public function testDefaultRetryDelayRetriesWithoutInjectedHooks(): void
+    {
+        $failed = $this->response(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR, '');
+        $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
+        $client = $this->createMock(SymfonyHttpClientInterface::class);
+        $client->expects(self::exactly(2))
+            ->method('request')
+            ->willReturnOnConsecutiveCalls($failed, $successful);
+
+        $result = (new HttpClient($client))->request(
+            method: HttpClientInterface::METHOD_GET,
+            url: 'https://example.test/health',
+            responseClass: HealthResponse::class,
+        );
+
+        self::assertSame('ok', $result->status);
     }
 
     public function testServerErrorWithoutRetryAfterHeaderIsRetried(): void
     {
-        $startedAt = hrtime(true);
         $failed = $this->response(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR, '');
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
         $this->client()->expects(self::exactly(3))
@@ -256,8 +277,7 @@ final class HttpClientTest extends TestCase
         );
 
         self::assertSame('ok', $result->status);
-        self::assertGreaterThanOrEqual(260_000_000, hrtime(true) - $startedAt);
-        self::assertLessThan(380_000_000, hrtime(true) - $startedAt);
+        self::assertSame([100_000, 200_000], $this->delays);
     }
 
     public function testServerErrorWithInvalidRetryAfterHeaderIsRetried(): void
@@ -275,6 +295,50 @@ final class HttpClientTest extends TestCase
         );
 
         self::assertSame('ok', $result->status);
+        self::assertSame([100_000], $this->delays);
+    }
+
+    public function testServerErrorHonorsNumericRetryAfterHeader(): void
+    {
+        $failed = $this->response(
+            HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR,
+            '',
+            [HttpClientInterface::HEADER_RETRY_AFTER => ['2']],
+        );
+        $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
+        $this->client()->expects(self::exactly(2))
+            ->method('request')
+            ->willReturnOnConsecutiveCalls($failed, $successful);
+
+        $result = $this->httpClient->request(
+            method: HttpClientInterface::METHOD_GET,
+            url: 'https://example.test/health',
+            responseClass: HealthResponse::class,
+        );
+
+        self::assertSame('ok', $result->status);
+        self::assertSame([2_000_000], $this->delays);
+    }
+
+    public function testRetryAfterDelayIsBounded(): void
+    {
+        $failed = $this->response(
+            HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR,
+            '',
+            [HttpClientInterface::HEADER_RETRY_AFTER => ['60']],
+        );
+        $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
+        $this->client()->expects(self::exactly(2))
+            ->method('request')
+            ->willReturnOnConsecutiveCalls($failed, $successful);
+
+        $this->httpClient->request(
+            method: HttpClientInterface::METHOD_GET,
+            url: 'https://example.test/health',
+            responseClass: HealthResponse::class,
+        );
+
+        self::assertSame([HttpClientInterface::MAX_RETRY_AFTER_MICROSECONDS], $this->delays);
     }
 
     public function testServerErrorWithDateRetryAfterHeaderIsRetried(): void
@@ -293,11 +357,11 @@ final class HttpClientTest extends TestCase
         );
 
         self::assertSame('ok', $result->status);
+        self::assertSame([0], $this->delays);
     }
 
     public function testRetryAfterUsesTheFirstHeaderValue(): void
     {
-        $startedAt = hrtime(true);
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(HttpClientInterface::HTTP_INTERNAL_SERVER_ERROR);
         $response->method('getContent')->willReturnCallback(
@@ -325,7 +389,7 @@ final class HttpClientTest extends TestCase
             responseClass: HealthResponse::class,
         );
 
-        self::assertLessThan(160_000_000, hrtime(true) - $startedAt);
+        self::assertSame([0], $this->delays);
     }
 
     public function testNumericRetryAfterIsConvertedToMicroseconds(): void
@@ -394,6 +458,26 @@ final class HttpClientTest extends TestCase
         }
     }
 
+    public function testMutatingServerErrorIsNotRetried(): void
+    {
+        $response = $this->response(
+            HttpClientInterface::HTTP_SERVICE_UNAVAILABLE,
+            '{"error":{"message":"Unavailable"}}',
+        );
+        $this->client()->expects(self::once())->method('request')->willReturn($response);
+
+        try {
+            $this->httpClient->request(
+                method: HttpClientInterface::METHOD_POST,
+                url: 'https://example.test/orders',
+                responseClass: EmptyResponse::class,
+            );
+            self::fail('Expected ApiException.');
+        } catch (ApiException) {
+            self::assertSame([], $this->delays);
+        }
+    }
+
     public function testExhaustedServerErrorsThrowApiException(): void
     {
         $response = $this->response(HttpClientInterface::HTTP_SERVICE_UNAVAILABLE, '{"error":{"message":"Unavailable"}}', ['retry-after' => ['0']]);
@@ -410,12 +494,12 @@ final class HttpClientTest extends TestCase
             self::fail('Expected ApiException.');
         } catch (ApiException $exception) {
             self::assertSame('Unavailable', $exception->getMessage());
+            self::assertSame([0, 0], $this->delays);
         }
     }
 
     public function testTransportFailureIsRetriedAndCanSucceed(): void
     {
-        $startedAt = hrtime(true);
         $successful = $this->response(HttpClientInterface::HTTP_OK, '{"data":{"status":"ok"}}');
         $attempts = 0;
         $this->client()->expects(self::exactly(2))
@@ -437,7 +521,7 @@ final class HttpClientTest extends TestCase
         );
 
         self::assertSame('ok', $result->status);
-        self::assertGreaterThanOrEqual(80_000_000, hrtime(true) - $startedAt);
+        self::assertSame([100_000], $this->delays);
     }
 
     public function testExhaustedTransportFailuresThrowTransportException(): void
@@ -456,24 +540,56 @@ final class HttpClientTest extends TestCase
             self::fail('Expected TransportException.');
         } catch (TransportException $exception) {
             self::assertSame('The HTTP request failed.', $exception->getMessage());
+            self::assertSame($transportException, $exception->getPrevious());
+            self::assertSame([100_000, 200_000], $this->delays);
+        }
+    }
+
+    public function testMutatingTransportFailureIsNotRetried(): void
+    {
+        $transportException = new SymfonyTransportException('Connection failed.');
+        $this->client()->expects(self::once())->method('request')->willThrowException($transportException);
+
+        try {
+            $this->httpClient->request(
+                method: HttpClientInterface::METHOD_POST,
+                url: 'https://example.test/orders',
+                responseClass: EmptyResponse::class,
+            );
+            self::fail('Expected TransportException.');
+        } catch (TransportException $exception) {
+            self::assertSame($transportException, $exception->getPrevious());
+            self::assertSame([], $this->delays);
         }
     }
 
     protected function setUp(): void
     {
-        $this->httpClient = new HttpClient($this->createStub(SymfonyHttpClientInterface::class));
+        $this->delays = [];
+        $this->httpClient = $this->httpClient($this->createStub(SymfonyHttpClientInterface::class));
     }
 
     private function client(): MockObject&SymfonyHttpClientInterface
     {
         if ($this->client === null) {
             $this->client = $this->createMock(SymfonyHttpClientInterface::class);
-            $this->httpClient = new HttpClient($this->client);
+            $this->httpClient = $this->httpClient($this->client);
         }
 
         self::assertInstanceOf(MockObject::class, $this->client);
 
         return $this->client;
+    }
+
+    private function httpClient(SymfonyHttpClientInterface $client): HttpClient
+    {
+        return new HttpClient(
+            $client,
+            sleeper: function (int $delay): void {
+                $this->delays[] = $delay;
+            },
+            jitter: static fn (int $delay): int => $delay,
+        );
     }
 
     /**

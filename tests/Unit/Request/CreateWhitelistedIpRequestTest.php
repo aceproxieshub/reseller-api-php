@@ -18,10 +18,10 @@ final class CreateWhitelistedIpRequestTest extends TestCase
         );
     }
 
-    public function testRejectsEmptyIp(): void
+    public function testRejectsInvalidIp(): void
     {
-        self::expectExceptionObject(new InvalidArgumentException('The IP address must not be empty.'));
+        self::expectExceptionObject(new InvalidArgumentException('The IP address must be a valid IP address.'));
 
-        new CreateWhitelistedIpRequest('');
+        new CreateWhitelistedIpRequest('invalid');
     }
 }

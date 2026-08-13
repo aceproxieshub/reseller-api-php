@@ -22,8 +22,15 @@ final readonly class Assert
 
     public static function nonEmptyString(string $value, string $propertyName): void
     {
-        if ($value === '') {
+        if (trim($value) === '') {
             throw new InvalidArgumentException('The ' . $propertyName . ' must not be empty.');
+        }
+    }
+
+    public static function ipAddress(string $value, string $propertyName): void
+    {
+        if (filter_var($value, FILTER_VALIDATE_IP) === false) {
+            throw new InvalidArgumentException('The ' . $propertyName . ' must be a valid IP address.');
         }
     }
 

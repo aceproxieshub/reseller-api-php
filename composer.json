@@ -1,8 +1,19 @@
 {
     "name": "aceproxieshub/reseller-api-php",
     "description": "PHP API library for the Aceproxies reseller API",
+    "keywords": [
+        "aceproxies",
+        "api",
+        "proxy",
+        "reseller"
+    ],
+    "homepage": "https://github.com/aceproxieshub/reseller-api-php",
     "type": "library",
     "license": "MIT",
+    "support": {
+        "issues": "https://github.com/aceproxieshub/reseller-api-php/issues",
+        "source": "https://github.com/aceproxieshub/reseller-api-php"
+    },
     "autoload": {
         "psr-4": {
             "Aceproxies\\ResellerApi\\": "src/"
@@ -25,13 +36,58 @@
         "slevomat/coding-standard": "^8.31",
         "phpstan/phpstan": "^2.2",
         "rector/rector": "^2.6",
-        "phpunit/phpunit": "^13.2",
+        "phpunit/phpunit": "^12.5 || ^13.2",
         "infection/infection": "^0.34.1"
+    },
+    "scripts": {
+        "analyse": "phpstan analyse",
+        "audit": "composer audit --locked --abandoned=fail",
+        "cs": "phpcs",
+        "refactor-check": "rector process --dry-run",
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-text --coverage-filter src",
+        "test-staging": "phpunit --configuration phpunit.integration.xml",
+        "quality": [
+            "@cs",
+            "@analyse",
+            "@refactor-check",
+            "@test"
+        ]
+    },
+    "archive": {
+        "exclude": [
+            "/.agents",
+            "/.codex",
+            "/.github",
+            "/build",
+            "/docs",
+            "/examples",
+            "/tests",
+            "/vendor",
+            "/.gitattributes",
+            "/.gitignore",
+            "/.phpunit.result.cache",
+            "/composer.lock",
+            "/infection.json5",
+            "/Makefile",
+            "/phpcs.xml",
+            "/phploc.phar",
+            "/phpstan.neon",
+            "/phpunit.integration.xml",
+            "/phpunit.xml",
+            "/rector.php",
+            "/RELEASING.md",
+            "/swagger.yaml"
+        ]
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "infection/extension-installer": true
-        }
+        },
+        "audit": {
+            "abandoned": "fail"
+        },
+        "sort-packages": true
     }
 }

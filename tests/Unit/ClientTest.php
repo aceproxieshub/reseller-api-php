@@ -31,6 +31,13 @@ final class ClientTest extends TestCase
         }
     }
 
+    public function testWhitespaceOnlyTokenThrowsInvalidArgumentException(): void
+    {
+        $this->expectExceptionObject(new InvalidArgumentException('The API token must not be empty.'));
+
+        new Client(" \t\n");
+    }
+
     public function testHealthReturnsHealthResponse(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);

@@ -10,7 +10,7 @@ final readonly class CreateWhitelistedIpRequest
 {
     public function __construct(public string $ip)
     {
-        Assert::nonEmptyString($this->ip, 'IP address');
+        Assert::ipAddress($this->ip, 'IP address');
     }
 
     /**
