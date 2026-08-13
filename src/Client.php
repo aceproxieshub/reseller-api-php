@@ -23,8 +23,6 @@ use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
 final readonly class Client implements ClientInterface
 {
     private const string BASE_URL = 'https://reseller.aceproxies.com/';
-    private const float DEFAULT_IDLE_TIMEOUT_SECONDS = 10.0;
-    private const float DEFAULT_MAX_DURATION_SECONDS = 30.0;
 
     private HttpClientInterface $httpClient;
 
@@ -36,10 +34,7 @@ final readonly class Client implements ClientInterface
         Assert::nonEmptyString($token, 'API token');
 
         $this->httpClient = $httpClient ?? new HttpClient(
-            SymfonyHttpClient::create([
-                'timeout' => self::DEFAULT_IDLE_TIMEOUT_SECONDS,
-                'max_duration' => self::DEFAULT_MAX_DURATION_SECONDS,
-            ]),
+            SymfonyHttpClient::create(),
             token: $token,
         );
     }

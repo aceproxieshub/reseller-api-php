@@ -46,7 +46,6 @@
         "refactor-check": "rector process --dry-run",
         "test": "phpunit",
         "test-coverage": "phpunit --coverage-text --coverage-filter src",
-        "test-staging": "phpunit --configuration phpunit.integration.xml",
         "quality": [
             "@cs",
             "@analyse",
