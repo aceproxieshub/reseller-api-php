@@ -1,5 +1,6 @@
 # Aceproxies Reseller API official PHP library
 
+[![Build Status](https://github.com/aceproxieshub/reseller-api-php/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/aceproxieshub/reseller-api-php/actions/workflows/)
 [![Latest Stable Version](http://poser.pugx.org/aceproxieshub/reseller-api-php/v)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
 [![PHP Version Require](http://poser.pugx.org/aceproxieshub/reseller-api-php/require/php)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
 [![License](http://poser.pugx.org/aceproxieshub/reseller-api-php/license)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
