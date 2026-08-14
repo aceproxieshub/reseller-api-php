@@ -1,9 +1,10 @@
 # Aceproxies Reseller API official PHP library
 
 [![Build Status](https://github.com/aceproxieshub/reseller-api-php/actions/workflows/quality.yml/badge.svg?branch=master)](https://github.com/aceproxieshub/reseller-api-php/actions/workflows/)
-[![Latest Stable Version](http://poser.pugx.org/aceproxieshub/reseller-api-php/v)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
-[![PHP Version Require](http://poser.pugx.org/aceproxieshub/reseller-api-php/require/php)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
-[![License](http://poser.pugx.org/aceproxieshub/reseller-api-php/license)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
+[![PHP Compatibility](https://github.com/aceproxieshub/reseller-api-php/actions/workflows/php-compatibility.yml/badge.svg?branch=master)](https://github.com/aceproxieshub/reseller-api-php/actions/workflows/php-compatibility.yml)
+[![Latest Stable Version](https://poser.pugx.org/aceproxieshub/reseller-api-php/v)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
+[![PHP Version Require](https://poser.pugx.org/aceproxieshub/reseller-api-php/require/php)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
+[![License](https://poser.pugx.org/aceproxieshub/reseller-api-php/license)](https://packagist.org/packages/aceproxieshub/reseller-api-php)
 
 The Aceproxies PHP library provides straightforward access to Reseller API from applications written in PHP language.
 Our mission is to provide you clear contracts through pre-defined set of classes and API resources for frictionless integration with your services.
