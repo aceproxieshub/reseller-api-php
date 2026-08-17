@@ -9,6 +9,7 @@ use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
+use InvalidArgumentException;
 
 interface ProductsInterface
 {
@@ -16,8 +17,9 @@ interface ProductsInterface
      * @throws ApiException
      * @throws InvalidResponseException
      * @throws TransportException
+     * @throws InvalidArgumentException
      */
-    public function list(): ProductListResponse;
+    public function list(?string $type = null): ProductListResponse;
 
     /**
      * @throws ApiException
