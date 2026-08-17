@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+### Changed
+
+- Upgrade phpunit/php-code-coverage from 14.3.0 to 14.3.1
+
 ## [1.0.0] - 2026-08-13
 
 This is the first release of the Aceproxies Reseller API PHP Library
