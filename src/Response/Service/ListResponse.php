@@ -12,7 +12,7 @@ final readonly class ListResponse
     public array $items;
 
     /**
-     * @param list<array{code: string, orderId: string, status: string, amount?: array{amount: int, unit: string}|null, auth?: array{method: string}|null, createdAt?: string|null, startedAt?: string|null, expiredAt?: string|null}> $items
+     * @param list<array{code: string, orderId: string, status: string, type?: string|null, amount?: array{amount: int, unit: string}|null, auth?: array{method: string}|null, createdAt?: string|null, startedAt?: string|null, expiredAt?: string|null}> $items
      */
     public function __construct(
         array $items,
@@ -24,6 +24,7 @@ final readonly class ListResponse
                 code: $item['code'],
                 orderId: $item['orderId'],
                 status: $item['status'],
+                type: $item['type'] ?? null,
                 amount: $item['amount'] ?? null,
                 auth: $item['auth'] ?? null,
                 createdAt: $item['createdAt'] ?? null,

@@ -35,7 +35,7 @@ interface ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function list(?int $page = null, ?int $limit = null): ListResponse;
+    public function list(?int $page = null, ?int $limit = null, ?string $type = null): ListResponse;
 
     /**
      * @throws ApiException
