@@ -21,6 +21,11 @@ final readonly class DetailResponse
     public PriceResponse $price;
 
     /**
+     * @deprecated Use $type instead.
+     */
+    public string $serviceType;
+
+    /**
      * @param array{amount: int, unit: string} $amount
      * @param array{method: string} $auth
      * @param array{amount: float|int, currency: string} $price
@@ -37,7 +42,7 @@ final readonly class DetailResponse
         public string $orderUuid,
         public string $protocol,
         array $price,
-        public string $serviceType,
+        public string $type,
         public string $status,
         public string $userId,
     ) {
@@ -47,5 +52,6 @@ final readonly class DetailResponse
         $this->startedAt = $startedAt === null ? null : new DateTimeImmutable($startedAt);
         $this->expiresAt = $expiresAt === null ? null : new DateTimeImmutable($expiresAt);
         $this->price = new PriceResponse($price['amount'], $price['currency']);
+        $this->serviceType = $this->type;
     }
 }

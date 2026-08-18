@@ -26,6 +26,7 @@ final readonly class ServiceResponse
         public string $code,
         public string $orderId,
         public string $status,
+        public ?string $type = null,
         ?array $amount = null,
         ?array $auth = null,
         ?string $createdAt = null,
