@@ -10,6 +10,8 @@ use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
+use Aceproxies\ResellerApi\Validation\Assert;
+use InvalidArgumentException;
 
 final readonly class Products implements ProductsInterface
 {
@@ -23,12 +25,23 @@ final readonly class Products implements ProductsInterface
      * @throws ApiException
      * @throws InvalidResponseException
      * @throws TransportException
+     * @throws InvalidArgumentException
      */
-    public function list(): ProductListResponse
+    public function list(?string $type = null): ProductListResponse
     {
+        if ($type !== null) {
+            Assert::nonEmptyString($type, 'product type');
+        }
+
+        $url = rtrim($this->baseUrl, '/') . '/api/v1/products';
+
+        if ($type !== null) {
+            $url .= '?' . http_build_query(['type' => $type]);
+        }
+
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/products',
+            $url,
             ProductListResponse::class,
         );
     }
