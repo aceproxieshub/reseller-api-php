@@ -18,6 +18,7 @@ interface HttpClientInterface
     public const int HTTP_TOO_MANY_REQUESTS = 429;
     public const int HTTP_OK = 200;
     public const int HTTP_UNAUTHORIZED = 401;
+    public const int HTTP_FORBIDDEN = 403;
     public const int HTTP_NOT_FOUND = 404;
     public const int HTTP_INTERNAL_SERVER_ERROR = 500;
     public const int HTTP_SERVER_ERROR_MIN = 500;

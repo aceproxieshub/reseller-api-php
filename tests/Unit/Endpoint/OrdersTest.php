@@ -35,6 +35,23 @@ final class OrdersTest extends TestCase
         self::assertSame(25, $result->limit);
     }
 
+    public function testListsTheLatestTenOrders(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/orders?limit=10',
+                OrderListResponse::class,
+            )
+            ->willReturn(new OrderListResponse([], 10, 1));
+
+        $result = (new Orders($httpClient, 'https://example.test/'))->list(limit: 10);
+
+        self::assertSame(10, $result->limit);
+    }
+
     public function testCreatesOrderWithJsonPayload(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);

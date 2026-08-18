@@ -1,6 +1,6 @@
 PHP ?= php
 
-.PHONY: default help quality validate audit rector rector-dry phpcbf phpstan phpunit phpunit-coverage infection
+.PHONY: default help quality validate audit rector rector-dry phpcbf phpstan phpunit phpunit-coverage infection ci\:integration-tests ci\:integration-tests\:full
 
 default: help
 
@@ -32,7 +32,6 @@ phpstan:
 phpunit:
 	@$(PHP) vendor/bin/phpunit
 
-
 phpunit-coverage:
 	@$(PHP) vendor/bin/phpunit --coverage-html build/coverage --coverage-filter src
 
@@ -45,10 +44,14 @@ infection:
 
 ci\:quality: phpcs phpstan rector-dry phpunit-coverage composer\:validate
 
+ci\:integration-tests:
+	@$(PHP) vendor/bin/phpunit --configuration phpunit.integration.local.xml
+
+ci\:integration-tests\:full:
+	@ACEPROXIES_STAGING_MODE=full $(PHP) vendor/bin/phpunit --configuration phpunit.integration.local.xml
+
 composer\:validate:
 	@composer validate --strict
 
 composer\:audit:
 	@composer audit --locked --abandoned=fail
-
-

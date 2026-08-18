@@ -93,7 +93,7 @@ final class HttpClientTest extends TestCase
 
     public function testSuccessfulEmptyResponseCanBeParsed(): void
     {
-        $response = $this->response(HttpClientInterface::HTTP_OK, '{"data":{}}');
+        $response = $this->response(HttpClientInterface::HTTP_OK, '{}');
         $this->client()->expects(self::once())->method('request')->willReturn($response);
 
         $result = $this->httpClient->request(

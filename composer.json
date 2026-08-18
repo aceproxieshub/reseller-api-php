@@ -72,7 +72,7 @@
             "/phpcs.xml",
             "/phploc.phar",
             "/phpstan.neon",
-            "/phpunit.integration.xml",
+            "/phpunit.integration.local.xml.dist",
             "/phpunit.xml",
             "/rector.php",
             "/RELEASING.md",

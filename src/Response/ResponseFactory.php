@@ -19,6 +19,7 @@ final readonly class ResponseFactory
     {
         try {
             $decoded = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+
             $data = is_array($decoded) ? ($decoded['data'] ?? null) : null;
 
             if (!is_array($data)) {

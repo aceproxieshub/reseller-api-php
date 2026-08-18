@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true">
+    <php>
+        <env name="ACEPROXIES_STAGING_BASE_URL" value="https://staging.example.test/"/>
+        <env name="ACEPROXIES_STAGING_TOKEN" value="replace-with-a-local-staging-token"/>
+        <env name="ACEPROXIES_STAGING_REQUEST_DELAY_MS" value="1000"/>
+    </php>
+    <testsuites>
+        <testsuite name="staging">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -20,14 +20,15 @@ final class CreateOrderItemTest extends TestCase
         }
     }
 
-    public function testOptionalDurationIsOmittedFromPayloadWhenUnset(): void
+    public function testUnsetDurationIsSentAsNullInPayload(): void
     {
         self::assertSame(
             [
                 'productId' => 'product-1',
+                'durationId' => null,
                 'quantity' => 1,
-                'addons' => [],
                 'options' => [],
+                'addons' => [],
             ],
             (new CreateOrderItem('product-1', 1))->toArray(),
         );
