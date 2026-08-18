@@ -58,12 +58,12 @@ final class ServicesTest extends TestCase
             ->method('request')
             ->with(
                 HttpClientInterface::METHOD_GET,
-                'https://example.test/api/v1/services?page=2&limit=50&type=dc_proxy',
+                'https://example.test/api/v1/services?page=2&limit=50&type=dedicated_proxy',
                 ListResponse::class,
             )
             ->willReturn(new ListResponse([], 50, 2));
 
-        $result = (new Services($httpClient, 'https://example.test///'))->list(2, 50, 'dc_proxy');
+        $result = (new Services($httpClient, 'https://example.test///'))->list(2, 50, 'dedicated_proxy');
 
         self::assertSame(2, $result->page);
     }
@@ -129,8 +129,8 @@ final class ServicesTest extends TestCase
         self::assertNotNull($result);
         self::assertSame('service/1', $result->code);
         self::assertSame(850, $result->orderId);
-        self::assertSame('dc_proxy', $result->type);
-        self::assertSame('dc_proxy', $result->serviceType);
+        self::assertSame('dedicated_proxy', $result->type);
+        self::assertSame('dedicated_proxy', $result->serviceType);
     }
 
     public function testFindReturnsNullWhenServiceIsNotFound(): void
@@ -880,7 +880,7 @@ final class ServicesTest extends TestCase
             orderUuid: 'order-uuid',
             protocol: 'http',
             price: ['amount' => 18.59, 'currency' => 'USD'],
-            type: 'dc_proxy',
+            type: 'dedicated_proxy',
             status: 'active',
             userId: 'user-1',
         );
