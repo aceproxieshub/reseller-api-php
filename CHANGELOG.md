@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+## [1.1.0] - 2026-08-18
 
+### Changed
 - Upgrade phpunit/php-code-coverage from 14.3.0 to 14.3.1
 
 ### Added
