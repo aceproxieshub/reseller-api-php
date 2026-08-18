@@ -44,7 +44,7 @@ final readonly class Services implements ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function list(?int $page = null, ?int $limit = null): ListResponse
+    public function list(?int $page = null, ?int $limit = null, ?string $type = null): ListResponse
     {
         $query = [];
 
@@ -56,6 +56,11 @@ final readonly class Services implements ServicesInterface
         if ($limit !== null) {
             Assert::positiveInteger($limit, 'limit');
             $query['limit'] = $limit;
+        }
+
+        if ($type !== null) {
+            Assert::nonEmptyString($type, 'service type');
+            $query['type'] = $type;
         }
 
         $url = rtrim($this->baseUrl, '/') . '/api/v1/services';

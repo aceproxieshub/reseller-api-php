@@ -13,7 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Optional service-type filtering through `Client::services()->list(type: $type)`
 - Optional product-type filtering through `Client::products()->list($type)`
+- Service `type` fields on service list and detail responses
 
 ## [1.0.0] - 2026-08-13
 

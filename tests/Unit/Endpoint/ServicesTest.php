@@ -51,6 +51,23 @@ final class ServicesTest extends TestCase
         self::assertSame(50, $result->limit);
     }
 
+    public function testListsServicesFilteredByType(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services?page=2&limit=50&type=dedicated_proxy',
+                ListResponse::class,
+            )
+            ->willReturn(new ListResponse([], 50, 2));
+
+        $result = (new Services($httpClient, 'https://example.test///'))->list(2, 50, 'dedicated_proxy');
+
+        self::assertSame(2, $result->page);
+    }
+
     public function testListsServicesWithoutPagination(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
@@ -86,6 +103,15 @@ final class ServicesTest extends TestCase
         $services->list(limit: 0);
     }
 
+    public function testServiceTypeMustNotBeEmpty(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        self::expectExceptionObject(new InvalidArgumentException('The service type must not be empty.'));
+
+        $services->list(type: '  ');
+    }
+
     public function testFindsServiceDetails(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
@@ -103,6 +129,8 @@ final class ServicesTest extends TestCase
         self::assertNotNull($result);
         self::assertSame('service/1', $result->code);
         self::assertSame(850, $result->orderId);
+        self::assertSame('dedicated_proxy', $result->type);
+        self::assertSame('dedicated_proxy', $result->serviceType);
     }
 
     public function testFindReturnsNullWhenServiceIsNotFound(): void
@@ -852,7 +880,7 @@ final class ServicesTest extends TestCase
             orderUuid: 'order-uuid',
             protocol: 'http',
             price: ['amount' => 18.59, 'currency' => 'USD'],
-            serviceType: 'dc_proxy',
+            type: 'dedicated_proxy',
             status: 'active',
             userId: 'user-1',
         );

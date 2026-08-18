@@ -177,7 +177,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreatesServiceListWithNestedTypedResponses(): void
     {
         $response = $this->factory->create(
-            '{"data":{"items":[{"code":"D32365E0C629B-170726","orderId":"019f6fae-623b-7142-a81f-238826fbd8dd","status":"active","amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"createdAt":"2026-07-17T10:45:27+00:00","startedAt":"2026-07-17T10:45:28+00:00","expiredAt":"2026-08-16T10:45:28+00:00"}],"limit":50,"page":1}}',
+            '{"data":{"items":[{"code":"D32365E0C629B-170726","orderId":"019f6fae-623b-7142-a81f-238826fbd8dd","status":"active","type":"dedicated_proxy","amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"createdAt":"2026-07-17T10:45:27+00:00","startedAt":"2026-07-17T10:45:28+00:00","expiredAt":"2026-08-16T10:45:28+00:00"}],"limit":50,"page":1}}',
             ListResponse::class,
             200,
         );
@@ -186,6 +186,7 @@ final class ResponseFactoryTest extends TestCase
         self::assertInstanceOf(ServiceResponse::class, $response->items[0]);
         self::assertSame('D32365E0C629B-170726', $response->items[0]->code);
         self::assertSame('019f6fae-623b-7142-a81f-238826fbd8dd', $response->items[0]->orderId);
+        self::assertSame('dedicated_proxy', $response->items[0]->type);
         self::assertNotNull($response->items[0]->amount);
         self::assertSame(1, $response->items[0]->amount->amount);
         self::assertSame('IP', $response->items[0]->amount->unit);
@@ -269,7 +270,7 @@ final class ResponseFactoryTest extends TestCase
     public function testCreatesServiceDetailsWithNestedTypedResponses(): void
     {
         $response = $this->factory->create(
-            '{"data":{"amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"code":"CCD9F42D9TGMZ-040426","createdAt":"2026-08-08T12:00:00+00:00","expiresAt":null,"isRecurring":false,"orderId":850,"orderUuid":"0758a20a-b66e-4295-9131-cb9d0fd953f6","price":{"amount":18.59,"currency":"USD"},"protocol":"http","serviceType":"dc_proxy","startedAt":null,"status":"active","userId":"user-1"}}',
+            '{"data":{"amount":{"amount":1,"unit":"IP"},"auth":{"method":"ip"},"code":"CCD9F42D9TGMZ-040426","createdAt":"2026-08-08T12:00:00+00:00","expiresAt":null,"isRecurring":false,"orderId":850,"orderUuid":"0758a20a-b66e-4295-9131-cb9d0fd953f6","price":{"amount":18.59,"currency":"USD"},"protocol":"http","type":"dedicated_proxy","startedAt":null,"status":"active","userId":"user-1"}}',
             DetailResponse::class,
             200,
         );
@@ -278,6 +279,8 @@ final class ResponseFactoryTest extends TestCase
         self::assertSame(1, $response->amount->amount);
         self::assertSame('ip', $response->auth->method);
         self::assertSame(18.59, $response->price->amount);
+        self::assertSame('dedicated_proxy', $response->type);
+        self::assertSame('dedicated_proxy', $response->serviceType);
         self::assertSame('+00:00', $response->createdAt->getTimezone()->getName());
         self::assertNull($response->startedAt);
         self::assertNull($response->expiresAt);
