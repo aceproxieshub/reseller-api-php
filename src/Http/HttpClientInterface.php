@@ -6,6 +6,7 @@ namespace Aceproxies\ResellerApi\Http;
 
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\TransportException;
+use Aceproxies\ResellerApi\Response\EmptyResponse;
 
 interface HttpClientInterface
 {
@@ -38,7 +39,7 @@ interface HttpClientInterface
      * @template T of object
      * @param class-string<T> $responseClass
      * @param array<string, mixed> $options
-     * @return T
+     * @return ($responseClass is class-string<EmptyResponse> ? EmptyResponse : T)
      * @throws ApiException
      * @throws TransportException
      */

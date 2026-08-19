@@ -20,4 +20,6 @@ composer:validate             Strictly validate Composer package metadata and lo
 composer:audit                Audit locked dependencies and abandoned packages
 ----------------------------------------------------------------------------------
 ci:quality                    Run all local code-quality checks
+ci:integration-tests          Run local read-only integration tests
+ci:integration-tests:full     Run local integration tests with mutations
 ----------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ final readonly class DetailResponse
 {
     public AmountResponse $amount;
 
-    public AuthResponse $auth;
+    public ?AuthResponse $auth;
 
     public DateTimeImmutable $createdAt;
 
@@ -27,12 +27,12 @@ final readonly class DetailResponse
 
     /**
      * @param array{amount: int, unit: string} $amount
-     * @param array{method: string} $auth
+     * @param array{method: string}|null $auth
      * @param array{amount: float|int, currency: string} $price
      */
     public function __construct(
         array $amount,
-        array $auth,
+        ?array $auth,
         public string $code,
         string $createdAt,
         ?string $startedAt,
@@ -47,7 +47,7 @@ final readonly class DetailResponse
         public string $userId,
     ) {
         $this->amount = new AmountResponse($amount['amount'], $amount['unit']);
-        $this->auth = new AuthResponse($auth['method']);
+        $this->auth = $auth === null ? null : new AuthResponse($auth['method']);
         $this->createdAt = new DateTimeImmutable($createdAt);
         $this->startedAt = $startedAt === null ? null : new DateTimeImmutable($startedAt);
         $this->expiresAt = $expiresAt === null ? null : new DateTimeImmutable($expiresAt);

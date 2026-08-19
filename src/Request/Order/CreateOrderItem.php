@@ -28,15 +28,12 @@ final readonly class CreateOrderItem
      */
     public function toArray(): array
     {
-        return array_filter(
-            [
-                'productId' => $this->productId,
-                'quantity' => $this->quantity,
-                'durationId' => $this->durationId,
-                'addons' => $this->addons,
-                'options' => $this->options,
-            ],
-            static fn (mixed $value): bool => $value !== null,
-        );
+        return [
+            'productId' => $this->productId,
+            'durationId' => $this->durationId,
+            'quantity' => $this->quantity,
+            'options' => $this->options,
+            'addons' => $this->addons,
+        ];
     }
 }

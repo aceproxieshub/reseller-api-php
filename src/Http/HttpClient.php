@@ -6,6 +6,7 @@ namespace Aceproxies\ResellerApi\Http;
 
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\TransportException;
+use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Closure;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -37,7 +38,10 @@ final readonly class HttpClient implements HttpClientInterface
     }
 
     /**
-     * @inheritdoc
+     * @template T of object
+     * @param class-string<T> $responseClass
+     * @param array<string, mixed> $options
+     * @return ($responseClass is class-string<EmptyResponse> ? EmptyResponse : T)
      */
     public function request(
         string $method,
@@ -66,6 +70,7 @@ final readonly class HttpClient implements HttpClientInterface
 
         $options['headers'] = array_merge($defaultHeaders, $headers);
 
+
         $attempt = 1;
 
         while (true) {
@@ -91,6 +96,10 @@ final readonly class HttpClient implements HttpClientInterface
 
             if ($statusCode < 200 || $statusCode >= 300) {
                 throw $this->createApiException($statusCode, $body);
+            }
+
+            if ($responseClass === EmptyResponse::class) {
+                return new EmptyResponse();
             }
 
             return $this->responseFactory->create($body, $responseClass, $statusCode);

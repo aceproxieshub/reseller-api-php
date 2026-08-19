@@ -17,3 +17,6 @@ composer-local.*
 
 # PHPUnit
 .phpunit.result.cache
+/phpunit.integration.local.xml
+# Legacy local integration fixtures; the tests no longer read this file.
+/tests/Integration/staging.config.local.json

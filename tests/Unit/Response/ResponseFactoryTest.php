@@ -277,6 +277,7 @@ final class ResponseFactoryTest extends TestCase
 
         self::assertSame('CCD9F42D9TGMZ-040426', $response->code);
         self::assertSame(1, $response->amount->amount);
+        self::assertNotNull($response->auth);
         self::assertSame('ip', $response->auth->method);
         self::assertSame(18.59, $response->price->amount);
         self::assertSame('dedicated_proxy', $response->type);
@@ -286,6 +287,17 @@ final class ResponseFactoryTest extends TestCase
         self::assertNull($response->expiresAt);
         self::assertFalse($response->isRecurring);
         self::assertSame(850, $response->orderId);
+    }
+
+    public function testCreatesServiceDetailsWithNullAuth(): void
+    {
+        $response = $this->factory->create(
+            '{"data":{"amount":{"amount":1,"unit":"IP"},"auth":null,"code":"service-1","createdAt":"2026-08-08T12:00:00+00:00","expiresAt":null,"isRecurring":false,"orderId":850,"orderUuid":"order-uuid","price":{"amount":18.59,"currency":"USD"},"protocol":"http","type":"dedicated_proxy","startedAt":null,"status":"active","userId":"user-1"}}',
+            DetailResponse::class,
+            200,
+        );
+
+        self::assertNull($response->auth);
     }
 
     public function testCreatesServiceBandwidthWithNestedTypedResponse(): void
