@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Endpoint;
 
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
@@ -35,7 +36,7 @@ interface ServicesInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function list(?int $page = null, ?int $limit = null, ?string $type = null): ListResponse;
+    public function list(?int $page = null, ?int $limit = null, ProductType|string|null $type = null): ListResponse;
 
     /**
      * @throws ApiException

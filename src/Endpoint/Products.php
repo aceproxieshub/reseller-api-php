@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Endpoint;
 
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Exception\InvalidResponseException;
 use Aceproxies\ResellerApi\Exception\TransportException;
@@ -27,10 +28,14 @@ final readonly class Products implements ProductsInterface
      * @throws TransportException
      * @throws InvalidArgumentException
      */
-    public function list(?string $type = null): ProductListResponse
+    public function list(ProductType|string|null $type = null): ProductListResponse
     {
         if ($type !== null) {
-            Assert::nonEmptyString($type, 'product type');
+            if (is_string($type)) {
+                Assert::nonEmptyString($type, 'product type');
+            }
+
+            $type = ProductType::normalize($type)->value;
         }
 
         $url = sprintf(

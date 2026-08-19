@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Products;
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
 use Aceproxies\ResellerApi\Response\Product\ProductListResponse;
 use Aceproxies\ResellerApi\Response\Product\ProductTypesResponse;
@@ -37,12 +38,12 @@ final class ProductsTest extends TestCase
             ->method('request')
             ->with(
                 HttpClientInterface::METHOD_GET,
-                'https://example.test/api/v1/products?type=residential',
+                'https://example.test/api/v1/products?type=residential_proxy',
                 ProductListResponse::class,
             )
             ->willReturn(new ProductListResponse([]));
 
-        $result = (new Products($httpClient, 'https://example.test/'))->list('residential');
+        $result = (new Products($httpClient, 'https://example.test/'))->list(ProductType::ResidentialProxy);
 
         self::assertSame([], $result->items);
     }
@@ -54,14 +55,48 @@ final class ProductsTest extends TestCase
             ->method('request')
             ->with(
                 HttpClientInterface::METHOD_GET,
-                'https://example.test/api/v1/products?type=data+center%2Fproxy',
+                'https://example.test/api/v1/products?type=dedicated_proxy',
                 ProductListResponse::class,
             )
             ->willReturn(new ProductListResponse([]));
 
-        $result = (new Products($httpClient, 'https://example.test/'))->list('data center/proxy');
+        $result = (new Products($httpClient, 'https://example.test/'))->list(ProductType::DedicatedProxy);
 
         self::assertSame([], $result->items);
+    }
+
+    public function testDeprecatedStringProductTypeIsSupported(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/products?type=mobile_proxy',
+                ProductListResponse::class,
+            )
+            ->willReturn(new ProductListResponse([]));
+
+        $this->expectUserDeprecationMessage(
+            'Passing product or service types as strings is deprecated. Use ProductType enum cases instead.',
+        );
+
+        $result = (new Products($httpClient, 'https://example.test/'))->list('mobile_proxy');
+
+        self::assertSame([], $result->items);
+    }
+
+    public function testRejectsUnsupportedProductType(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::never())->method('request');
+
+        $this->expectUserDeprecationMessage(
+            'Passing product or service types as strings is deprecated. Use ProductType enum cases instead.',
+        );
+        $this->expectExceptionObject(new InvalidArgumentException('Unsupported product or service type "unsupported".'));
+
+        (new Products($httpClient, 'https://example.test/'))->list('unsupported');
     }
 
     public function testRejectsEmptyProductType(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Tests\Integration;
 
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Enum\RotationInterval;
 use Aceproxies\ResellerApi\Request\Service\Residential\CreateProxyRequest;
 use Aceproxies\ResellerApi\Response\Service\Residential\ProxyRequestResponse;
@@ -13,8 +14,8 @@ use Aceproxies\ResellerApi\Response\Service\ServiceResponse;
 final class ResidentialProxyRequestsApiTest extends StagingTestCase
 {
     private const RESIDENTIAL_SERVICE_TYPES = [
-        'residential_proxy',
-        'payg_residential_proxy',
+        ProductType::ResidentialProxy->value,
+        ProductType::PaygResidentialProxy->value,
     ];
 
     public function testListsAndFindsAnExistingResidentialProxyRequest(): void

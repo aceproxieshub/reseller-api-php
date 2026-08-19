@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Unit\Endpoint;
 
 use Aceproxies\ResellerApi\Endpoint\Services;
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Enum\Protocol;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
@@ -63,9 +64,42 @@ final class ServicesTest extends TestCase
             )
             ->willReturn(new ListResponse([], 50, 2));
 
-        $result = (new Services($httpClient, 'https://example.test///'))->list(2, 50, 'dedicated_proxy');
+        $result = (new Services($httpClient, 'https://example.test///'))->list(2, 50, ProductType::DedicatedProxy);
 
         self::assertSame(2, $result->page);
+    }
+
+    public function testDeprecatedStringServiceTypeIsSupported(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects(self::once())
+            ->method('request')
+            ->with(
+                HttpClientInterface::METHOD_GET,
+                'https://example.test/api/v1/services?type=mobile_proxy',
+                ListResponse::class,
+            )
+            ->willReturn(new ListResponse([], 50, 1));
+
+        $this->expectUserDeprecationMessage(
+            'Passing product or service types as strings is deprecated. Use ProductType enum cases instead.',
+        );
+
+        $result = (new Services($httpClient, 'https://example.test/'))->list(type: 'mobile_proxy');
+
+        self::assertSame(1, $result->page);
+    }
+
+    public function testRejectsUnsupportedServiceType(): void
+    {
+        $services = new Services($this->createStub(HttpClientInterface::class), 'https://example.test');
+
+        $this->expectUserDeprecationMessage(
+            'Passing product or service types as strings is deprecated. Use ProductType enum cases instead.',
+        );
+        $this->expectExceptionObject(new InvalidArgumentException('Unsupported product or service type "unsupported".'));
+
+        $services->list(type: 'unsupported');
     }
 
     public function testListsServicesWithoutPagination(): void
