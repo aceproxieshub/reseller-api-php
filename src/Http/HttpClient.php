@@ -9,7 +9,6 @@ use Aceproxies\ResellerApi\Exception\TransportException;
 use Aceproxies\ResellerApi\Response\EmptyResponse;
 use Aceproxies\ResellerApi\Response\ResponseFactory;
 use Closure;
-use JsonException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface as SymfonyHttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -39,7 +38,10 @@ final readonly class HttpClient implements HttpClientInterface
     }
 
     /**
-     * @inheritdoc
+     * @template T of object
+     * @param class-string<T> $responseClass
+     * @param array<string, mixed> $options
+     * @return ($responseClass is class-string<EmptyResponse> ? EmptyResponse : T)
      */
     public function request(
         string $method,
@@ -68,6 +70,7 @@ final readonly class HttpClient implements HttpClientInterface
 
         $options['headers'] = array_merge($defaultHeaders, $headers);
 
+
         $attempt = 1;
 
         while (true) {
@@ -95,8 +98,8 @@ final readonly class HttpClient implements HttpClientInterface
                 throw $this->createApiException($statusCode, $body);
             }
 
-            if ($this->isEmptyResponse($body, $responseClass)) {
-                return $this->responseFactory->create('{"data":{}}', $responseClass, $statusCode);
+            if ($responseClass === EmptyResponse::class) {
+                return new EmptyResponse();
             }
 
             return $this->responseFactory->create($body, $responseClass, $statusCode);
@@ -171,24 +174,5 @@ final readonly class HttpClient implements HttpClientInterface
         $message = is_array($error) ? ($error['message'] ?? null) : null;
 
         return new ApiException($statusCode, is_string($message) ? $message : null, $body);
-    }
-
-    private function isEmptyResponse(string $body, string $responseClass): bool
-    {
-        if ($responseClass !== EmptyResponse::class) {
-            return false;
-        }
-
-        if (trim($body) === '') {
-            return true;
-        }
-
-        try {
-            $decoded = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return false;
-        }
-
-        return !is_array($decoded) || !array_key_exists('data', $decoded) || $decoded['data'] === null;
     }
 }

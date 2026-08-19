@@ -91,9 +91,10 @@ final class HttpClientTest extends TestCase
         self::assertSame('ok', $result->status);
     }
 
-    public function testSuccessfulEmptyResponseCanBeParsed(): void
+    #[DataProvider('successfulEmptyResponseBodyProvider')]
+    public function testSuccessfulEmptyResponseDoesNotAssumeABodyEnvelope(string $body): void
     {
-        $response = $this->response(HttpClientInterface::HTTP_OK, '{}');
+        $response = $this->response(HttpClientInterface::HTTP_OK, $body);
         $this->client()->expects(self::once())->method('request')->willReturn($response);
 
         $result = $this->httpClient->request(
@@ -609,6 +610,19 @@ final class HttpClientTest extends TestCase
         yield 'idle timeout only' => [['timeout' => 1.5], 1.5, 30.0];
         yield 'maximum duration only' => [['max_duration' => 5.0], 10.0, 5.0];
         yield 'both timeouts' => [['timeout' => 1.5, 'max_duration' => 5.0], 1.5, 5.0];
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function successfulEmptyResponseBodyProvider(): iterable
+    {
+        yield 'empty body' => [''];
+        yield 'whitespace body' => [" \n\t"];
+        yield 'empty object' => ['{}'];
+        yield 'null data envelope' => ['{"data":null}'];
+        yield 'endpoint-specific object' => ['{"message":"deleted"}'];
+        yield 'malformed body' => ['{'];
     }
 
     protected function setUp(): void

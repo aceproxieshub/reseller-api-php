@@ -21,14 +21,9 @@ abstract class StagingTestCase extends TestCase
 {
     private const DEFAULT_REQUEST_DELAY_MILLISECONDS = 1_000;
 
-    private const ORDER_TYPES = [
-        'payg_residential_proxy',
-        'residential_proxy',
+    private const PRODUCT_TYPES = [
         'dedicated_proxy',
         'static_residential_proxy',
-    ];
-
-    private const RESIDENTIAL_SERVICE_TYPES = [
         'residential_proxy',
         'payg_residential_proxy',
     ];
@@ -101,61 +96,6 @@ abstract class StagingTestCase extends TestCase
         ));
     }
 
-    protected function residentialService(): ServiceResponse
-    {
-        $services = $this->residentialServiceCandidates();
-
-        if ($services === [] && $this->fullMode()) {
-            foreach (self::RESIDENTIAL_SERVICE_TYPES as $type) {
-                $this->createOrder($type);
-                $services = $this->residentialServiceCandidates();
-
-                if ($services !== []) {
-                    break;
-                }
-            }
-        }
-
-        return $this->randomItem($services, 'residential proxy services with endpoint access');
-    }
-
-    /**
-     * @return list<ServiceResponse>
-     */
-    protected function residentialServices(): array
-    {
-        return array_values(array_filter(
-            $this->services(),
-            static fn (ServiceResponse $service): bool => in_array(
-                strtolower((string) $service->type),
-                self::RESIDENTIAL_SERVICE_TYPES,
-                true,
-            ) && strtolower($service->status) === 'active',
-        ));
-    }
-
-    /**
-     * @return list<ServiceResponse>
-     */
-    protected function residentialServiceCandidates(): array
-    {
-        $residential = $this->client->services()->residential();
-        $services = [];
-
-        foreach ($this->residentialServices() as $service) {
-            try {
-                $residential->proxyRequests($service->code);
-                $services[] = $service;
-            } catch (ApiException $exception) {
-                if (!$this->isUnavailableResidentialService($exception)) {
-                    throw $exception;
-                }
-            }
-        }
-
-        return $services;
-    }
-
     /**
      * @template T
      * @param callable(string): ?T $operation
@@ -216,50 +156,34 @@ abstract class StagingTestCase extends TestCase
             || strtolower(trim((string) $exception->apiMessage)) === 'unsupported action';
     }
 
-    protected function isUnavailableResidentialService(ApiException $exception): bool
-    {
-        return in_array($exception->statusCode, [
-            HttpClientInterface::HTTP_FORBIDDEN,
-            HttpClientInterface::HTTP_NOT_FOUND,
-        ], true)
-            || strtolower(trim((string) $exception->apiMessage)) === 'access denied';
-    }
-
     /**
      * @return list<string>
      */
-    protected function orderTypes(): array
+    protected function productTypes(): array
     {
-        return self::ORDER_TYPES;
+        return self::PRODUCT_TYPES;
     }
 
-    protected function createOrder(string $type): CreateOrderResponse
+    protected function createOrder(string $productType): CreateOrderResponse
     {
-        if (!in_array($type, self::ORDER_TYPES, true)) {
-            throw new RuntimeException('Unsupported staging order type: ' . $type);
+        if (!in_array($productType, self::PRODUCT_TYPES, true)) {
+            throw new RuntimeException('Unsupported staging product type: ' . $productType);
         }
 
-        $products = array_values(array_filter(
-            $this->client->products()->list()->items,
-            static fn (ProductResponse $product): bool => $product->type === $type,
-        ));
+        $products = $this->client->products()->list($productType)->items;
+        $product = $this->randomItem($products, $productType . ' products');
 
-        $products = array_values(array_filter(
-            $products,
-            fn (ProductResponse $product): bool => $this->isOrderCompatible($product, $type),
-        ));
-        $product = $this->randomItem($products, $type . ' products');
-        $durationId = in_array($type, ['payg_residential_proxy', 'residential_proxy'], true)
+        $durationId = in_array($productType, ['payg_residential_proxy'], true)
             ? null
-            : $this->randomItem($product->durations ?? [], $type . ' product durations')->id;
+            : $this->randomItem($product->durations ?? [], $productType . ' product durations')->id;
 
-        $options = match ($type) {
+        $options = match ($productType) {
             'payg_residential_proxy' => ['trafficGb' => 3],
             'residential_proxy' => [],
             'dedicated_proxy', 'static_residential_proxy' => [
                 'proxyType' => 'http',
                 'authType' => 'combined',
-                'locations' => [$this->randomItem($this->locationIds($product), $type . ' product locations')],
+                'locations' => [$this->randomItem($this->locationIds($product), $productType . ' product locations')],
             ],
         };
 
@@ -273,18 +197,6 @@ abstract class StagingTestCase extends TestCase
             ),
         ]));
     }
-
-    private function isOrderCompatible(ProductResponse $product, string $type): bool
-    {
-        if (in_array($type, ['dedicated_proxy', 'static_residential_proxy'], true)) {
-            return $product->durations !== null
-                && $product->durations !== []
-                && $this->locationIds($product) !== [];
-        }
-
-        return $product->durations === null || $product->durations === [];
-    }
-
     /**
      * @return list<string>
      */
