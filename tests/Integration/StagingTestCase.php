@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aceproxies\ResellerApi\Tests\Integration;
 
 use Aceproxies\ResellerApi\Client;
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Exception\ApiException;
 use Aceproxies\ResellerApi\Http\HttpClient;
 use Aceproxies\ResellerApi\Http\HttpClientInterface;
@@ -22,10 +23,10 @@ abstract class StagingTestCase extends TestCase
     private const DEFAULT_REQUEST_DELAY_MILLISECONDS = 1_000;
 
     private const PRODUCT_TYPES = [
-        'dedicated_proxy',
-        'static_residential_proxy',
-        'residential_proxy',
-        'payg_residential_proxy',
+        ProductType::DedicatedProxy,
+        ProductType::StaticResidentialProxy,
+        ProductType::ResidentialProxy,
+        ProductType::PaygResidentialProxy,
     ];
 
     protected Client $client;
@@ -157,33 +158,33 @@ abstract class StagingTestCase extends TestCase
     }
 
     /**
-     * @return list<string>
+     * @return list<ProductType>
      */
     protected function productTypes(): array
     {
         return self::PRODUCT_TYPES;
     }
 
-    protected function createOrder(string $productType): CreateOrderResponse
+    protected function createOrder(ProductType $productType): CreateOrderResponse
     {
         if (!in_array($productType, self::PRODUCT_TYPES, true)) {
-            throw new RuntimeException('Unsupported staging product type: ' . $productType);
+            throw new RuntimeException('Unsupported staging product type: ' . $productType->value);
         }
 
         $products = $this->client->products()->list($productType)->items;
-        $product = $this->randomItem($products, $productType . ' products');
+        $product = $this->randomItem($products, $productType->value . ' products');
 
-        $durationId = in_array($productType, ['payg_residential_proxy'], true)
+        $durationId = $productType === ProductType::PaygResidentialProxy
             ? null
-            : $this->randomItem($product->durations ?? [], $productType . ' product durations')->id;
+            : $this->randomItem($product->durations ?? [], $productType->value . ' product durations')->id;
 
         $options = match ($productType) {
-            'payg_residential_proxy' => ['trafficGb' => 3],
-            'residential_proxy' => [],
-            'dedicated_proxy', 'static_residential_proxy' => [
+            ProductType::PaygResidentialProxy => ['trafficGb' => 3],
+            ProductType::ResidentialProxy => [],
+            ProductType::DedicatedProxy, ProductType::StaticResidentialProxy => [
                 'proxyType' => 'http',
                 'authType' => 'combined',
-                'locations' => [$this->randomItem($this->locationIds($product), $productType . ' product locations')],
+                'locations' => [$this->randomItem($this->locationIds($product), $productType->value . ' product locations')],
             ],
         };
 

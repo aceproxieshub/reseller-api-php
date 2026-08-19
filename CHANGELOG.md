@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Refactor client API URL construction to use readable multi-line `sprintf()` calls
+- Add the string based `ProductType` enum for supported product and service types
+- Raw string type filters are deprecated
 
 ## [1.1.0] - 2026-08-18
 

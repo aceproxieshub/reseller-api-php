@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aceproxies\ResellerApi\Tests\Integration;
 
+use Aceproxies\ResellerApi\Enum\ProductType;
 use Aceproxies\ResellerApi\Request\Service\CreateProlongationRequest;
 use Aceproxies\ResellerApi\Response\Service\CreateProlongationResponse;
 use Aceproxies\ResellerApi\Response\Service\ProlongationsResponse;
@@ -23,7 +24,7 @@ final class ServicesProlongationApiTest extends StagingTestCase
             return;
         }
 
-        $this->createOrder('payg_residential_proxy');
+        $this->createOrder(ProductType::PaygResidentialProxy);
         $result = $this->mutateService(
             function (string $code): ?CreateProlongationResponse {
                 $options = $this->client->services()->getProlongations($code);
