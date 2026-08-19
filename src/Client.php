@@ -68,7 +68,10 @@ final readonly class Client implements ClientInterface
     {
         $response = $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/version',
+            sprintf(
+                '%s/api/v1/version',
+                rtrim($this->baseUrl, '/'),
+            ),
             VersionResponse::class,
         );
 

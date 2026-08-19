@@ -63,7 +63,10 @@ final readonly class Services implements ServicesInterface
             $query['type'] = $type;
         }
 
-        $url = rtrim($this->baseUrl, '/') . '/api/v1/services';
+        $url = sprintf(
+            '%s/api/v1/services',
+            rtrim($this->baseUrl, '/'),
+        );
 
         if ($query !== []) {
             $url .= '?' . http_build_query($query);
@@ -89,7 +92,11 @@ final readonly class Services implements ServicesInterface
         try {
             return $this->httpClient->request(
                 HttpClientInterface::METHOD_GET,
-                rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($code),
+                sprintf(
+                    '%s/api/v1/services/%s',
+                    rtrim($this->baseUrl, '/'),
+                    rawurlencode($code),
+                ),
                 DetailResponse::class,
             );
         } catch (ApiException $exception) {
@@ -114,7 +121,11 @@ final readonly class Services implements ServicesInterface
         try {
             return $this->httpClient->request(
                 HttpClientInterface::METHOD_GET,
-                rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/bandwidth',
+                sprintf(
+                    '%s/api/v1/services/%s/bandwidth',
+                    rtrim($this->baseUrl, '/'),
+                    rawurlencode($serviceCode),
+                ),
                 BandwidthResponse::class,
             );
         } catch (ApiException $exception) {
@@ -139,7 +150,11 @@ final readonly class Services implements ServicesInterface
         try {
             return $this->httpClient->request(
                 HttpClientInterface::METHOD_GET,
-                rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/credentials',
+                sprintf(
+                    '%s/api/v1/services/%s/auth/credentials',
+                    rtrim($this->baseUrl, '/'),
+                    rawurlencode($serviceCode),
+                ),
                 CredentialsResponse::class,
             );
         } catch (ApiException $exception) {
@@ -163,7 +178,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_PUT,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/credentials',
+            sprintf(
+                '%s/api/v1/services/%s/auth/credentials',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             CredentialsResponse::class,
             ['json' => $request->toArray()],
         );
@@ -181,7 +200,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/whitelisted-ips',
+            sprintf(
+                '%s/api/v1/services/%s/auth/whitelisted-ips',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             WhitelistedIpsResponse::class,
         );
     }
@@ -198,7 +221,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_POST,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/whitelisted-ips',
+            sprintf(
+                '%s/api/v1/services/%s/auth/whitelisted-ips',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             WhitelistedIpResponse::class,
             ['json' => $request->toArray()],
         );
@@ -217,7 +244,12 @@ final readonly class Services implements ServicesInterface
 
         $this->httpClient->request(
             HttpClientInterface::METHOD_DELETE,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/auth/whitelisted-ips/' . rawurlencode($ip),
+            sprintf(
+                '%s/api/v1/services/%s/auth/whitelisted-ips/%s',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+                rawurlencode($ip),
+            ),
             EmptyResponse::class,
         );
     }
@@ -234,7 +266,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements',
+            sprintf(
+                '%s/api/v1/services/%s/ip-replacements',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             IpReplacementsResponse::class,
         );
     }
@@ -251,7 +287,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_POST,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements',
+            sprintf(
+                '%s/api/v1/services/%s/ip-replacements',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             IpReplacementResponse::class,
             ['json' => $request->toArray()],
         );
@@ -291,7 +331,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements/locations',
+            sprintf(
+                '%s/api/v1/services/%s/ip-replacements/locations',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             IpReplacementLocationsResponse::class,
         );
     }
@@ -308,7 +352,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/prolongations',
+            sprintf(
+                '%s/api/v1/services/%s/prolongations',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             ProlongationsResponse::class,
         );
     }
@@ -325,7 +373,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_POST,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/prolongations',
+            sprintf(
+                '%s/api/v1/services/%s/prolongations',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             CreateProlongationResponse::class,
             ['json' => $request->toArray()],
         );
@@ -343,7 +395,11 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/proxy-list',
+            sprintf(
+                '%s/api/v1/services/%s/proxy-list',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+            ),
             ProxyListResponse::class,
         );
     }
@@ -360,7 +416,11 @@ final readonly class Services implements ServicesInterface
 
         $this->httpClient->request(
             HttpClientInterface::METHOD_PATCH,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($code),
+            sprintf(
+                '%s/api/v1/services/%s',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($code),
+            ),
             EmptyResponse::class,
             ['json' => $request->toArray()],
         );
@@ -383,7 +443,12 @@ final readonly class Services implements ServicesInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/' . rawurlencode($serviceCode) . '/ip-replacements/' . $path,
+            sprintf(
+                '%s/api/v1/services/%s/ip-replacements/%s',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+                $path,
+            ),
             IpReplacementCountResponse::class,
         );
     }

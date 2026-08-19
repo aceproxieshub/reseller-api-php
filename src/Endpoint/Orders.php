@@ -43,7 +43,10 @@ final readonly class Orders implements OrdersInterface
             $query['limit'] = $limit;
         }
 
-        $url = rtrim($this->baseUrl, '/') . '/api/v1/orders';
+        $url = sprintf(
+            '%s/api/v1/orders',
+            rtrim($this->baseUrl, '/'),
+        );
 
         if ($query !== []) {
             $url .= '?' . http_build_query($query);
@@ -65,7 +68,10 @@ final readonly class Orders implements OrdersInterface
     {
         return $this->httpClient->request(
             HttpClientInterface::METHOD_POST,
-            rtrim($this->baseUrl, '/') . '/api/v1/orders',
+            sprintf(
+                '%s/api/v1/orders',
+                rtrim($this->baseUrl, '/'),
+            ),
             CreateOrderResponse::class,
             ['json' => $request->toArray()],
         );
@@ -84,7 +90,11 @@ final readonly class Orders implements OrdersInterface
         try {
             return $this->httpClient->request(
                 HttpClientInterface::METHOD_GET,
-                rtrim($this->baseUrl, '/') . '/api/v1/orders/' . rawurlencode($id),
+                sprintf(
+                    '%s/api/v1/orders/%s',
+                    rtrim($this->baseUrl, '/'),
+                    rawurlencode($id),
+                ),
                 OrderResponse::class,
             );
         } catch (ApiException $exception) {
