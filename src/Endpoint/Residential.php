@@ -34,7 +34,10 @@ final readonly class Residential implements ResidentialInterface
     {
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/countries',
+            sprintf(
+                '%s/api/v1/services/residential/countries',
+                rtrim($this->baseUrl, '/'),
+            ),
             CountriesResponse::class,
         );
     }
@@ -48,7 +51,10 @@ final readonly class Residential implements ResidentialInterface
     {
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/rotation-intervals/',
+            sprintf(
+                '%s/api/v1/services/residential/rotation-intervals/',
+                rtrim($this->baseUrl, '/'),
+            ),
             RotationIntervalsResponse::class,
         );
     }
@@ -65,7 +71,11 @@ final readonly class Residential implements ResidentialInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests',
+            sprintf(
+                '%s/api/v1/services/residential/%s/proxy-requests',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($code),
+            ),
             ProxyRequestsResponse::class,
         );
     }
@@ -84,7 +94,12 @@ final readonly class Residential implements ResidentialInterface
         try {
             return $this->httpClient->request(
                 HttpClientInterface::METHOD_GET,
-                rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests/' . rawurlencode($id),
+                sprintf(
+                    '%s/api/v1/services/residential/%s/proxy-requests/%s',
+                    rtrim($this->baseUrl, '/'),
+                    rawurlencode($code),
+                    rawurlencode($id),
+                ),
                 ProxyRequestResponse::class,
             );
         } catch (ApiException $exception) {
@@ -108,7 +123,11 @@ final readonly class Residential implements ResidentialInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_POST,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests',
+            sprintf(
+                '%s/api/v1/services/residential/%s/proxy-requests',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($code),
+            ),
             ProxyRequestResponse::class,
             ['json' => $request->toArray()],
         );
@@ -127,7 +146,12 @@ final readonly class Residential implements ResidentialInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_DELETE,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($code) . '/proxy-requests/' . rawurlencode($id),
+            sprintf(
+                '%s/api/v1/services/residential/%s/proxy-requests/%s',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($code),
+                rawurlencode($id),
+            ),
             ProxyRequestResponse::class,
         );
     }
@@ -145,7 +169,12 @@ final readonly class Residential implements ResidentialInterface
 
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/services/residential/' . rawurlencode($serviceCode) . '/proxy-requests/' . rawurlencode($proxyRequestId) . '/proxy-list',
+            sprintf(
+                '%s/api/v1/services/residential/%s/proxy-requests/%s/proxy-list',
+                rtrim($this->baseUrl, '/'),
+                rawurlencode($serviceCode),
+                rawurlencode($proxyRequestId),
+            ),
             ProxyListResponse::class,
         );
     }

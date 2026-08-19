@@ -33,7 +33,10 @@ final readonly class Products implements ProductsInterface
             Assert::nonEmptyString($type, 'product type');
         }
 
-        $url = rtrim($this->baseUrl, '/') . '/api/v1/products';
+        $url = sprintf(
+            '%s/api/v1/products',
+            rtrim($this->baseUrl, '/'),
+        );
 
         if ($type !== null) {
             $url .= '?' . http_build_query(['type' => $type]);
@@ -55,7 +58,10 @@ final readonly class Products implements ProductsInterface
     {
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/products/types',
+            sprintf(
+                '%s/api/v1/products/types',
+                rtrim($this->baseUrl, '/'),
+            ),
             ProductTypesResponse::class,
         );
     }

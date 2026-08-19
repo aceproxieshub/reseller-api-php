@@ -27,7 +27,10 @@ final readonly class Health implements HealthInterface
     {
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/health',
+            sprintf(
+                '%s/api/v1/health',
+                rtrim($this->baseUrl, '/'),
+            ),
             HealthResponse::class,
         );
     }

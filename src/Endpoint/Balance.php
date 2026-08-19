@@ -27,7 +27,10 @@ final readonly class Balance implements BalanceInterface
     {
         return $this->httpClient->request(
             HttpClientInterface::METHOD_GET,
-            rtrim($this->baseUrl, '/') . '/api/v1/balance',
+            sprintf(
+                '%s/api/v1/balance',
+                rtrim($this->baseUrl, '/'),
+            ),
             BalanceResponse::class,
         );
     }
