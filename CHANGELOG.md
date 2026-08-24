@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-19
+
 ### Changed
 
 - Refactor client API URL construction to use readable multi-line `sprintf()` calls
